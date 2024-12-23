@@ -76,16 +76,8 @@ class _RegisterPageState extends State<RegisterPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.lock_open_rounded,
-              size: 100,
-              color: Theme.of(context).colorScheme.inversePrimary,
-            ),
-            SizedBox(
-              height: 25,
-            ),
             Text(
-              "Let's Create Account For you",
+              "Let's Create Account",
               style: TextStyle(
                   fontSize: 16,
                   color: Theme.of(context).colorScheme.inversePrimary),
@@ -185,30 +177,6 @@ class _RegisterPageState extends State<RegisterPage> {
             SizedBox(
               height: 25,
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'already Registered',
-                  style: TextStyle(
-                      color: Theme.of(context).colorScheme.inversePrimary),
-                ),
-                SizedBox(
-                  width: 4,
-                ),
-                GestureDetector(
-                  onTap: widget.onTap,
-                  child: Text(
-                    'Login now',
-                    style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: -1,
-                        color: Theme.of(context).colorScheme.inversePrimary),
-                  ),
-                )
-              ],
-            )
           ],
         ),
       ),

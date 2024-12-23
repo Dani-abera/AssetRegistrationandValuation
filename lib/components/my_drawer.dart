@@ -1,6 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:land_house_verify/pages/registration_page.dart';
 import '../pages/admin_validator_approval_page.dart';
+import '../pages/register_asset_page.dart';
+import '../services/login_or_register.dart';
 import 'my_drawer_tile.dart';
 
 class MyDrawer extends StatelessWidget {
@@ -55,11 +58,32 @@ class MyDrawer extends StatelessWidget {
               );
             },
           ),
+          MyDrawerTile(
+            text: 'R E G I S T E R  A S S E T S',
+            icon: Icons.app_registration_sharp,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => RegisterAssetPage(),
+                ),
+              );
+            },
+          ),
           const Spacer(),
           MyDrawerTile(
             text: 'L O G O U T',
             icon: Icons.logout,
-            onTap: () {},
+            onTap: () async {
+              await FirebaseAuth.instance.signOut();
+              // Navigate to the login or home screen after signing out
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => LoginOrRegister(),
+                ),
+              );
+            },
           ),
           SizedBox(
             height: 25,

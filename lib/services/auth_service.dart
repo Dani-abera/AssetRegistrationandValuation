@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:mailer/mailer.dart';
+import 'package:mailer/smtp_server.dart';
 
 class AuthService {
   // Firebase Authentication instance
@@ -41,6 +43,7 @@ class AuthService {
     required String name,
     required String email,
     required String phoneNumber,
+    required String role,
     required String cvUrl,
     required String certificationUrl,
   }) async {
@@ -52,6 +55,7 @@ class AuthService {
         'email': email,
         'phoneNumber': phoneNumber,
         'cv': cvUrl,
+        'role': 'validator',
         'certification': certificationUrl,
         'status': 'pending',
         'created_at': FieldValue.serverTimestamp(),
@@ -67,6 +71,38 @@ class AuthService {
       return null;
     } catch (e) {
       return e.toString();
+    }
+  }
+
+  // Helper method to send email
+  Future<void> _sendValidatorCredentials(String email, String password) async {
+    //  email credentials
+    String username = 'daniabera74@gmail.com';
+    String password = 'ybot wtyf yhmp wnxr'; //  app-specific password for Gmail
+
+    final smtpServer = gmail(username, password);
+
+    final message = Message()
+      ..from = Address(username, 'LandHouseVerify')
+      ..recipients.add(email)
+      ..subject = 'Your Validator Account Credentials'
+      ..text = '''
+        Welcome as an approved validator!
+        
+        Here are your login credentials:
+        Email: $email
+        Password: $password
+        
+        Please change your password after your first login.
+        
+        Best regards,
+        Your App Team
+      ''';
+
+    try {
+      await send(message, smtpServer);
+    } catch (e) {
+      print('Error sending email: $e');
     }
   }
 
@@ -88,6 +124,12 @@ class AuthService {
         email: email.trim(),
         password: 'defaultPassword123', // Generate or assign temporary password
       );
+      // Save additional user data (name, role) in Firestore
+      await _firestore.collection('users').doc(userCredential.user!.uid).set({
+        'name': name.trim(),
+        'email': email.trim(),
+        'role': role, // Role determines if user is Admin or User
+      });
 
       // Save Approved Validator to Firestore (Based on Type)
       final userId = userCredential.user!.uid;
@@ -97,6 +139,7 @@ class AuthService {
           'name': name,
           'email': email,
           'phoneNumber': phoneNumber,
+          'role': role,
           'cv': cvUrl,
           'certification': certificationUrl,
           'created_at': FieldValue.serverTimestamp(),
@@ -107,15 +150,15 @@ class AuthService {
           'name': name,
           'email': email,
           'phoneNumber': phoneNumber,
+          'role': role,
           'cv': cvUrl,
           'certification': certificationUrl,
           'created_at': FieldValue.serverTimestamp(),
         });
       }
 
-      // Send Email with Login Details (Optional)
-      // Use Firebase Functions or other email services for sending email
-
+      // Send email with login credentials
+      await _sendValidatorCredentials(email, 'defaultPassword123');
       // Remove from pending list after approval
       await _firestore.collection('pending_validators').doc(docId).delete();
 

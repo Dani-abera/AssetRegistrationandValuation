@@ -6,6 +6,8 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import 'approval_page.dart';
+
 class RegisterValidatorPage extends StatefulWidget {
   final Function()? onTap;
   const RegisterValidatorPage({super.key, this.onTap});
@@ -68,6 +70,16 @@ class _RegisterValidatorPageState extends State<RegisterValidatorPage> {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text('Please complete the form.')));
     }
+  }
+
+  void navigateToUserDetailScreen() {
+    // Navigate to UserDetailScreen and pass the email
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => UserDetailScreen(email: email),
+      ),
+    );
   }
 
   @override
@@ -215,7 +227,30 @@ class _RegisterValidatorPageState extends State<RegisterValidatorPage> {
               SizedBox(
                 height: 25,
               ),
-              MyButton(onTap: submitForm, text: 'Submit'),
+              //MyButton(onTap: submitForm, text: 'Submit'),
+              GestureDetector(
+                onTap: () {
+                  navigateToUserDetailScreen();
+                  submitForm();
+                },
+                child: Container(
+                  padding: EdgeInsets.all(25),
+                  margin: EdgeInsets.symmetric(horizontal: 25),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.secondary,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Center(
+                    child: Text(
+                      'Submit',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: Theme.of(context).colorScheme.inversePrimary),
+                    ),
+                  ),
+                ),
+              ),
               SizedBox(
                 height: 25,
               ),
