@@ -90,11 +90,9 @@ class MyDrawer extends StatelessWidget {
             onTap: () async {
               await FirebaseAuth.instance.signOut();
               // Navigate to the login or home screen after signing out
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => LoginOrRegister(),
-                ),
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => LoginOrRegister()),
+                (route) => false, // Remove all previous routes
               );
             },
           ),
