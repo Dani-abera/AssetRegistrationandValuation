@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:land_house_verify/pages/registration_page.dart';
 import 'package:land_house_verify/pages/setting_page.dart';
-import '../pages/admin_validator_approval_page.dart';
+import 'package:land_house_verify/pages/valuation_Input_page.dart';
 import '../pages/register_asset_page.dart';
 import '../services/login_or_register.dart';
 import 'my_drawer_tile.dart';
@@ -36,8 +36,8 @@ class MyDrawerValidator extends StatelessWidget {
             onTap: () => Navigator.pop(context),
           ),
           MyDrawerTile(
-            text: 'C R E A T E  A C C O U N T ',
-            icon: Icons.account_box,
+            text: 'C R E A T E  R E P O R T S',
+            icon: Icons.insert_drive_file_rounded,
             onTap: () {
               Navigator.push(
                 context,
@@ -48,20 +48,20 @@ class MyDrawerValidator extends StatelessWidget {
             },
           ),
           MyDrawerTile(
-            text: 'A P P R O V A L',
-            icon: Icons.approval,
+            text: 'E V A L U A T I O N',
+            icon: Icons.input_rounded,
             onTap: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => AdminValidatorApproval(),
+                  builder: (context) => ValuationInputPage(assetId: '1'),
                 ),
               );
             },
           ),
           MyDrawerTile(
-            text: 'R E G I S T E R  A S S E T S',
-            icon: Icons.app_registration_sharp,
+            text: 'R E V A L U A T I O N',
+            icon: Icons.refresh_rounded,
             onTap: () {
               Navigator.push(
                 context,

@@ -32,7 +32,6 @@ class _ValuationInputPageState extends State<ValuationInputPage> {
 
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Valuation submitted successfully!')));
-      Navigator.pop(context);
     }
   }
 
@@ -52,6 +51,9 @@ class _ValuationInputPageState extends State<ValuationInputPage> {
                 validator: (value) =>
                     value!.isEmpty ? 'Please enter valuator name' : null,
               ),
+              SizedBox(
+                height: 25,
+              ),
               DropdownButtonFormField(
                 value: valuationMethod,
                 items: ['Market Approach', 'Income Approach', 'Cost Approach']
@@ -61,6 +63,9 @@ class _ValuationInputPageState extends State<ValuationInputPage> {
                 onChanged: (value) => setState(() => valuationMethod = value!),
                 decoration: InputDecoration(labelText: 'Valuation Method'),
               ),
+              SizedBox(
+                height: 25,
+              ),
               TextFormField(
                 decoration: InputDecoration(labelText: 'Valuation Amount'),
                 keyboardType: TextInputType.number,
@@ -68,7 +73,9 @@ class _ValuationInputPageState extends State<ValuationInputPage> {
                 validator: (value) =>
                     value!.isEmpty ? 'Enter valuation amount' : null,
               ),
-              SizedBox(height: 20),
+              SizedBox(
+                height: 25,
+              ),
               ElevatedButton(
                 onPressed: submitValuation,
                 child: Text('Submit Valuation'),
