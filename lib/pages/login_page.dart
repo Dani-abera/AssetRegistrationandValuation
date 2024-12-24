@@ -46,7 +46,7 @@ class _LoginPageState extends State<LoginPage> {
           builder: (_) => const AdminPage(),
         ),
       );
-    } else if (result == 'Validator') {
+    } else if (result == 'validator') {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(

@@ -22,7 +22,7 @@ class _RegisterPageState extends State<RegisterPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
-  String _selectedRole = 'User'; // Default selected role for dropdown
+  String _selectedRole = 'validator'; // Default selected role for dropdown
   bool _isLoading = false; // To show loading spinner during signup
   bool isPasswordHidden = true;
 
@@ -49,10 +49,6 @@ class _RegisterPageState extends State<RegisterPage> {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text('Signup Successful! Now Turn to Login'),
       ));
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => LoginPage(onTap: () {})),
-      );
     } else {
       // Signup failed: Show error message
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -154,7 +150,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     _selectedRole = newValue!; // Update role selection
                   });
                 },
-                items: ['Admin', 'User'].map((role) {
+                items: ['Admin', 'validator'].map((role) {
                   return DropdownMenuItem(
                     value: role,
                     child: Text(role),
