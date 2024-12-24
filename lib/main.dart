@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:land_house_verify/pages/validator_registration_page.dart';
-
+import 'package:land_house_verify/pages/asset_detail_page.dart';
 import 'package:land_house_verify/services/login_or_register.dart';
 import 'package:land_house_verify/themes/themes_provider.dart';
 import 'package:provider/provider.dart';
@@ -8,7 +7,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
 void main() async {
+  // Initialize Flutter Binding
   WidgetsFlutterBinding.ensureInitialized();
+  // Initialize Firebase
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -33,10 +34,12 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title:
           'Property Registration and Verification System', // Title of the application
-      // The theme of the app is provided by ThemeProvider
+
       theme: Provider.of<ThemeProvider>(context).themeData,
 
-      //home: RegisterValidatorPage(),
+      // home: AssetDetailPage(
+      //   assetId: '1',
+      // ),
       home: LoginOrRegister(), // Initial screen for user authentication
     );
   }

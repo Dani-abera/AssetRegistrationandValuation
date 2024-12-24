@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:land_house_verify/components/my_button.dart';
-import 'package:land_house_verify/components/my_textfield.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
-
 import 'approval_page.dart';
 
 class RegisterValidatorPage extends StatefulWidget {
@@ -65,21 +61,21 @@ class _RegisterValidatorPageState extends State<RegisterValidatorPage> {
 
       // Simulate notification to admin (can be expanded with push notifications)
       ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Registration sent to admin for approval.')));
+        SnackBar(
+          content: Text('Registration sent to admin for approval.'),
+        ),
+      );
     } else {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Please complete the form.')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Please complete the form.'),
+        ),
+      );
     }
   }
 
   void navigateToUserDetailScreen() {
-    // Navigate to UserDetailScreen and pass the email
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => UserDetailScreen(email: email),
-      ),
-    );
+    UserDetailScreen(email: email);
   }
 
   @override

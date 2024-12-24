@@ -28,7 +28,7 @@ class AuthService {
       await _firestore.collection('users').doc(userCredential.user!.uid).set({
         'name': name.trim(),
         'email': email.trim(),
-        'role': role, // Role determines if user is Admin or User
+        'role': role, // Role determines if user is Admin or Validator
       });
 
       return null; // Success: no error message
@@ -191,7 +191,7 @@ class AuthService {
           .doc(userCredential.user!.uid)
           .get();
 
-      return userDoc['role']; // Return the user's role (Admin/User)
+      return userDoc['role']; // Return the user's role (Admin/Validator)
     } catch (e) {
       return e.toString(); // Error: return the exception message
     }

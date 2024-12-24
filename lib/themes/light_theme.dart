@@ -1,47 +1,49 @@
 import 'package:flutter/material.dart';
 
-// Light Mode Theme for Land and House Registration App
+// Light Mode Theme
 ThemeData lightMode = ThemeData(
   colorScheme: ColorScheme.light(
-    background: Colors.white, // Tertiary - Soft White for background
-    primary: Color(0xFF3855A8), // Primary - Forest Green
-    secondary: Color(0xFFF9A825), // Secondary - Golden Yellow
-    tertiary: Color(0xFFFFFFFF), // Pure White for clean surfaces
-    inversePrimary: Color(0xFF37474F), // Text and Icon Color - Dark Slate Gray
-    error: Color(0xFFD84315), // Accent/Error - Deep Orange
+    background: Colors.white,
+    primary: Color(0xFF3855A8),
+    secondary: Color(0xFFF9A825),
+    tertiary: Color(0xFFFFFFFF),
+    inversePrimary: Color(0xFF37474F),
+    error: Color(0xFFD84315),
   ),
-  // AppBar uses primary color
-  // AppBar text/icons in white
-  // CTA buttons in secondary (golden yellow)
 
-  scaffoldBackgroundColor:
-      Color(0xFFF5F5F5), // Consistent background for scaffold
+  // Scaffold Background Color
+  scaffoldBackgroundColor: Color(0xFFF5F5F5),
+
+  // AppBar Background and Foreground Color
   appBarTheme: AppBarTheme(
-    backgroundColor: Color(0xFF2E7D32), // AppBar uses primary color
-    foregroundColor: Colors.white, // AppBar text/icons in white
+    backgroundColor: Color(0xFF2E7D32),
+    foregroundColor: Colors.white,
     elevation: 2,
   ),
+
   buttonTheme: ButtonThemeData(
-    buttonColor: Color(0xFFF9A825), // CTA buttons in secondary (golden yellow)
+    buttonColor: Color(0xFFF9A825),
     textTheme: ButtonTextTheme.primary,
   ),
+
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ElevatedButton.styleFrom(
-      backgroundColor: Color(0xFFF9A825), // Elevated button color
+      backgroundColor: Color(0xFFF9A825),
       foregroundColor: Colors.white,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
       ),
     ),
   ),
+
   inputDecorationTheme: InputDecorationTheme(
     filled: true,
-    fillColor: Color(0xFFFFFFFF), // Input fields with white background
+    fillColor: Color(0xFFFFFFFF),
     enabledBorder: OutlineInputBorder(
-      borderSide: BorderSide(color: Color(0xFF2E7D32)), // Green border
+      borderSide: BorderSide(color: Color(0xFF2E7D32)),
     ),
     focusedBorder: OutlineInputBorder(
-      borderSide: BorderSide(color: Color(0xFFF9A825)), // Yellow on focus
+      borderSide: BorderSide(color: Color(0xFFF9A825)),
     ),
   ),
 );

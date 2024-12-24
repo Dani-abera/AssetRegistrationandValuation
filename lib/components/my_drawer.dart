@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:land_house_verify/pages/registration_page.dart';
+import 'package:land_house_verify/pages/setting_page.dart';
 import '../pages/admin_validator_approval_page.dart';
 import '../pages/register_asset_page.dart';
 import '../services/login_or_register.dart';
@@ -66,6 +67,18 @@ class MyDrawer extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) => RegisterAssetPage(),
+                ),
+              );
+            },
+          ),
+          MyDrawerTile(
+            text: 'S E T T I N G',
+            icon: Icons.assignment,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => SettingPage(),
                 ),
               );
             },

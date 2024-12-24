@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-
+import 'package:land_house_verify/pages/validator_page.dart';
 import '../components/my_button.dart';
 import '../components/my_textfield.dart';
 import '../services/auth_service.dart';
 import 'admin_page.dart';
-import 'home_page.dart';
 
 class LoginPage extends StatefulWidget {
   final Function()? onTap;
@@ -51,7 +50,7 @@ class _LoginPageState extends State<LoginPage> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (_) => const UserScreen(),
+          builder: (_) => const ValidatorPage(),
         ),
       );
     } else {
