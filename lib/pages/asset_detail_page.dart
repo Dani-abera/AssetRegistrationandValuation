@@ -42,6 +42,7 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
         'assignedValidator': selectedValidator,
         'validatorAssignedAt': FieldValue.serverTimestamp(),
       });
+      // Save additional user data (name, role) in Firestore
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Validator assigned successfully')),
