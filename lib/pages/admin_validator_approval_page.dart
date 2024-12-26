@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../services/auth_service.dart';
+import 'package:get_it/get_it.dart';
+
+import '../components/show_dialog.dart';
+import '../model/validator_model.dart';
+
+import '../services/register_validator_service.dart';
 import 'approval_page.dart';
 
 class AdminValidatorApproval extends StatefulWidget {
@@ -11,6 +16,10 @@ class AdminValidatorApproval extends StatefulWidget {
 }
 
 class _AdminValidatorApprovalState extends State<AdminValidatorApproval> {
+  final showConfirmation = GetIt.instance<ShowConfirmationDialogClass>();
+
+  final registerValidator = GetIt.instance<RegisterValidatorService>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -23,142 +32,68 @@ class _AdminValidatorApprovalState extends State<AdminValidatorApproval> {
         ),
         title: const Text('Validator Approvals'),
       ),
-      body: GestureDetector(
-        onTap: () {
-          // Navigator.push(
-          //   context,
-          //   MaterialPageRoute(
-          //     builder: (context) => UserDetailScreen(email: email),
-          //   ),
-          // );
-          print('you Clicked ');
-        },
-        child: StreamBuilder(
-          stream: FirebaseFirestore.instance
-              .collection('pending_validators')
-              .snapshots(),
-          builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            }
-            if (snapshot.hasError) {
-              return const Center(child: Text('Error loading data'));
-            }
-            final validators = snapshot.data?.docs ?? [];
+      body: StreamBuilder(
+        stream: FirebaseFirestore.instance
+            .collection('pending_validators')
+            .snapshots(),
+        builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasError) {
+            return const Center(child: Text('Error loading data'));
+          }
+          final validators = snapshot.data?.docs ?? [];
 
-            return ListView.builder(
-              itemCount: validators.length,
-              itemBuilder: (context, index) {
-                final data = validators[index].data() as Map<String, dynamic>;
-                final docId = validators[index].id;
+          return ListView.builder(
+            itemCount: validators.length,
+            itemBuilder: (context, index) {
+              final data = validators[index].data() as Map<String, dynamic>;
+              final docId = validators[index].id;
 
-                return ListTile(
-                  title: Text(data['name']),
-                  subtitle: Text('Type: ${data['validatorType']}'),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
+              return ListTile(
+                title: Text(data['name']),
+                subtitle: Text('Type: ${data['validatorType']}'),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => UserDetailScreen(
+                        email: data['email'],
+                      ),
+                    ),
+                  );
+                },
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
                         icon: const Icon(Icons.check, color: Colors.green),
                         onPressed: () async {
-                          if (await _showConfirmationDialog(
+                          if (await showConfirmation.showConfirmationDialog(
                               context, 'approve')) {
-                            _approveValidator(docId, data);
+                            final validator = ValidatorModel.fromMap(
+                                data); // Convert map to model
+                            showConfirmation.approveValidator(
+                                context, docId, validator);
                           }
-                        },
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.close, color: Colors.red),
-                        onPressed: () async {
-                          if (await _showConfirmationDialog(
-                              context, 'reject')) {
-                            _rejectValidator(docId);
-                          }
-                        },
-                      ),
-                    ],
-                  ),
-                );
-              },
-            );
-          },
-        ),
+                        }),
+                    IconButton(
+                      icon: const Icon(Icons.close, color: Colors.red),
+                      onPressed: () async {
+                        if (await showConfirmation.showConfirmationDialog(
+                            context, 'reject')) {
+                          showConfirmation.rejectValidator(context, docId);
+                        }
+                      },
+                    ),
+                  ],
+                ),
+              );
+            },
+          );
+        },
       ),
     );
-  }
-
-  /// Show confirmation dialog before approving or rejecting
-  Future<bool> _showConfirmationDialog(
-      BuildContext context, String action) async {
-    return await showDialog<bool>(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text('Confirm $action'),
-            content: Text('Are you sure you want to $action this validator?'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text('Cancel'),
-              ),
-              TextButton(
-                onPressed: () => Navigator.pop(context, true),
-                child: Text(action.toUpperCase()),
-              ),
-            ],
-          ),
-        ) ??
-        false;
-  }
-
-  /// Approve validator with confirmation
-  Future<void> _approveValidator(
-      String docId, Map<String, dynamic> data) async {
-    try {
-      final result = await AuthService().approveValidator(
-        docId: docId,
-        validatorType: data['validatorType'] ?? 'N/A',
-        name: data['name'] ?? 'N/A',
-        email: data['email'] ?? 'N/A',
-        phoneNumber: data['phoneNumber'] ?? 'N/A',
-        role: 'validator',
-        cvUrl: data['cv'] ?? 'N/A',
-        certificationUrl: data['certification'] ?? 'N/A',
-      );
-
-      if (result != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text('Error: $result'), backgroundColor: Colors.red),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Validator approved successfully'),
-            backgroundColor: Colors.green,
-          ),
-        );
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
-      );
-    }
-  }
-
-  /// Reject validator with confirmation
-  Future<void> _rejectValidator(String docId) async {
-    try {
-      await AuthService().rejectValidator(docId);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Validator rejected'),
-          backgroundColor: Colors.orange,
-        ),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
-      );
-    }
   }
 }

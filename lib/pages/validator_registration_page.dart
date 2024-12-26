@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'approval_page.dart';
 
 class RegisterValidatorPage extends StatefulWidget {
   final Function()? onTap;
@@ -72,10 +71,6 @@ class _RegisterValidatorPageState extends State<RegisterValidatorPage> {
         ),
       );
     }
-  }
-
-  void navigateToUserDetailScreen() {
-    UserDetailScreen(email: email);
   }
 
   @override
@@ -225,10 +220,7 @@ class _RegisterValidatorPageState extends State<RegisterValidatorPage> {
               ),
               //MyButton(onTap: submitForm, text: 'Submit'),
               GestureDetector(
-                onTap: () {
-                  navigateToUserDetailScreen();
-                  submitForm();
-                },
+                onTap: () {},
                 child: Container(
                   padding: EdgeInsets.all(25),
                   margin: EdgeInsets.symmetric(horizontal: 25),
