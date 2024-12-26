@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:land_house_verify/pages/asset_detail_page.dart';
 import 'package:land_house_verify/services/login_or_register.dart';
-import 'package:land_house_verify/services/service_locator.dart';
+import 'package:land_house_verify/service_locator.dart';
 import 'package:land_house_verify/themes/themes_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -39,9 +38,6 @@ class MyApp extends StatelessWidget {
 
       theme: Provider.of<ThemeProvider>(context).themeData,
 
-      // home: AssetDetailPage(
-      //   assetId: '1',
-      // ),
       home: LoginOrRegister(), // Initial screen for user authentication
     );
   }

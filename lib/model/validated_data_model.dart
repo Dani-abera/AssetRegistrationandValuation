@@ -1,5 +1,7 @@
-// Asset Model
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class ValidatedDataModel {
+  final String id; // Add ID field
   final String name;
   final String valuatorName;
   final String valuationExecutor;
@@ -17,6 +19,7 @@ class ValidatedDataModel {
   final double totalCostAfterRevaluation;
 
   ValidatedDataModel({
+    required this.id,
     required this.name,
     required this.valuatorName,
     required this.valuationExecutor,
@@ -34,19 +37,58 @@ class ValidatedDataModel {
     required this.totalCostAfterRevaluation,
   });
 
-  // Method to calculate the total building cost (including construction and related costs)
-  double getTotalCost() {
-    return totalCostBuildingConstruction + totalBuildingRelatedCost;
+  Map<String, dynamic> toMap() {
+    return {
+      'name': name,
+      'valuatorName': valuatorName,
+      'valuationExecutor': valuationExecutor,
+      'assetType': assetType,
+      'valuationMethod': valuationMethod,
+      'constructionCosts':
+          constructionCosts.map((cost) => cost.toMap()).toList(),
+      'buildingRelatedCosts':
+          buildingRelatedCosts.map((cost) => cost.toMap()).toList(),
+      'totalCostBuildingConstruction': totalCostBuildingConstruction,
+      'totalBuildingRelatedCost': totalBuildingRelatedCost,
+      'totalCostBuilding': totalCostBuilding,
+      'valuationStatus': valuationStatus,
+      'valuationDate': Timestamp.fromDate(valuationDate),
+      'memlcFactor': memlcFactor,
+      'currencyFactor': currencyFactor,
+      'totalCostAfterRevaluation': totalCostAfterRevaluation,
+    };
   }
 
-  // Method to calculate the revalued cost of the building
-  double getRevaluedCost() {
-    double result1 = memlcFactor * totalCostBuilding;
-    return result1 * currencyFactor;
+  factory ValidatedDataModel.fromMap(
+      Map<String, dynamic> map, String documentId) {
+    return ValidatedDataModel(
+      id: documentId,
+      name: map['name'] ?? '',
+      valuatorName: map['valuatorName'] ?? '',
+      valuationExecutor: map['valuationExecutor'] ?? '',
+      assetType: map['assetType'] ?? '',
+      valuationMethod: map['valuationMethod'] ?? '',
+      constructionCosts: (map['constructionCosts'] as List<dynamic>)
+          .map((cost) => ConstructionCost.fromMap(cost))
+          .toList(),
+      buildingRelatedCosts: (map['buildingRelatedCosts'] as List<dynamic>)
+          .map((cost) => BuildingRelatedCost.fromMap(cost))
+          .toList(),
+      totalCostBuildingConstruction:
+          map['totalCostBuildingConstruction']?.toDouble() ?? 0.0,
+      totalBuildingRelatedCost:
+          map['totalBuildingRelatedCost']?.toDouble() ?? 0.0,
+      totalCostBuilding: map['totalCostBuilding']?.toDouble() ?? 0.0,
+      valuationStatus: map['valuationStatus'] ?? '',
+      valuationDate: (map['valuationDate'] as Timestamp).toDate(),
+      memlcFactor: map['memlcFactor']?.toDouble() ?? 1.0,
+      currencyFactor: map['currencyFactor']?.toDouble() ?? 1.0,
+      totalCostAfterRevaluation:
+          map['totalCostAfterRevaluation']?.toDouble() ?? 0.0,
+    );
   }
 }
 
-// Construction Cost Model
 class ConstructionCost {
   final String description;
   final double areaInM2;
@@ -61,9 +103,28 @@ class ConstructionCost {
     required this.unitRate,
     required this.amount,
   });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'description': description,
+      'areaInM2': areaInM2,
+      'numberOfTypicalBuildings': numberOfTypicalBuildings,
+      'unitRate': unitRate,
+      'amount': amount,
+    };
+  }
+
+  factory ConstructionCost.fromMap(Map<String, dynamic> map) {
+    return ConstructionCost(
+      description: map['description'] ?? '',
+      areaInM2: map['areaInM2']?.toDouble() ?? 0.0,
+      numberOfTypicalBuildings: map['numberOfTypicalBuildings'] ?? 0,
+      unitRate: map['unitRate']?.toDouble() ?? 0.0,
+      amount: map['amount']?.toDouble() ?? 0.0,
+    );
+  }
 }
 
-// Building Related Cost Model
 class BuildingRelatedCost {
   final String description;
   final double amount;
@@ -72,4 +133,18 @@ class BuildingRelatedCost {
     required this.description,
     required this.amount,
   });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'description': description,
+      'amount': amount,
+    };
+  }
+
+  factory BuildingRelatedCost.fromMap(Map<String, dynamic> map) {
+    return BuildingRelatedCost(
+      description: map['description'] ?? '',
+      amount: map['amount']?.toDouble() ?? 0.0,
+    );
+  }
 }

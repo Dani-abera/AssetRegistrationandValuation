@@ -51,12 +51,12 @@ class MyDrawerValidator extends StatelessWidget {
             text: 'E V A L U A T I O N',
             icon: Icons.input_rounded,
             onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ValuationInputPage(assetId: '1'),
-                ),
-              );
+              //Navigator.push(
+              //   context,
+              //   MaterialPageRoute(
+              //     builder: (context) => AssetValuationForm(),
+              //   ),
+              // );
             },
           ),
           MyDrawerTile(

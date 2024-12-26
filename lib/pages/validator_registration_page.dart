@@ -22,7 +22,7 @@ class _RegisterValidatorPageState extends State<RegisterValidatorPage> {
   File? certificationFile;
 
   Future<void> pickFile(bool isCV) async {
-    // External storage file picker logic
+    // External storage file picker
     final directory = await getExternalStorageDirectory();
     final file = File('${directory!.path}/example.pdf');
 
@@ -58,7 +58,6 @@ class _RegisterValidatorPageState extends State<RegisterValidatorPage> {
           .collection('pending_validators')
           .add(validatorData);
 
-      // Simulate notification to admin (can be expanded with push notifications)
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Registration sent to admin for approval.'),
