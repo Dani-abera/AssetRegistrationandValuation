@@ -5,7 +5,8 @@ import 'package:land_house_verify/components/my_drawer.dart';
 import 'asset_detail_page.dart';
 
 class AdminPage extends StatefulWidget {
-  const AdminPage({super.key});
+  String name;
+  AdminPage({required this.name, super.key});
 
   @override
   State<AdminPage> createState() => _AdminPageState();
@@ -17,7 +18,7 @@ class _AdminPageState extends State<AdminPage> {
     return Scaffold(
       drawer: MyDrawer(),
       appBar: AppBar(
-        title: Text('Admin Page'),
+        title: Text('Welcome, ${widget.name.toUpperCase()}'),
       ),
       body: StreamBuilder(
         stream: FirebaseFirestore.instance.collection('assets').snapshots(),
@@ -36,19 +37,30 @@ class _AdminPageState extends State<AdminPage> {
               final data = assets[index].data() as Map<String, dynamic>;
               final docId = assets[index].id;
 
-              return ListTile(
-                title: Text(data['assetName']),
-                subtitle: Text('Type: ${data['assetType']}'),
-                trailing: const Icon(Icons.arrow_forward_ios),
-                onTap: () {
-                  // Navigate to detailed asset page
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => AssetDetailPage(assetId: docId),
-                    ),
-                  );
-                },
+              return Card(
+                margin:
+                    const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                elevation: 5,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.0), // Rounded corners
+                ),
+                child: ListTile(
+                  title: Text(
+                    data['assetName'].toUpperCase(),
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  subtitle: Text('Type: ${data['assetType']}'),
+                  trailing: const Icon(Icons.arrow_forward_ios),
+                  onTap: () {
+                    // Navigate to detailed asset page
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => AssetDetailPage(assetId: docId),
+                      ),
+                    );
+                  },
+                ),
               );
             },
           );

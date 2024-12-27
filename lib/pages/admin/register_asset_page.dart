@@ -67,7 +67,6 @@ class _RegisterAssetPageState extends State<RegisterAssetPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Asset registered successfully!')),
         );
-        Navigator.pop(context);
       } else {
         throw Exception(result);
       }

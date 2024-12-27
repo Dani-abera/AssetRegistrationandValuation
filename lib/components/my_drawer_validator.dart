@@ -54,7 +54,9 @@ class MyDrawerValidator extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => ValidationInputScreen(),
+                  builder: (context) => ValidationInputScreen(
+                    assetId: '1',
+                  ),
                 ),
               );
             },

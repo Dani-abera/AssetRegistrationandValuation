@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
+import 'package:open_file/open_file.dart';
 import '../../model/validated_data_model.dart';
 import '../../service_locator.dart';
+import '../../services/report_service.dart';
 import '../../services/validation_data_service.dart';
 import 'building_related_cost_controller.dart';
 import 'construction_cost_controller.dart';
@@ -91,6 +92,77 @@ class _ValidationInputScreenState extends State<ValidationInputScreen> {
     setState(() {});
   }
 
+  Future<void> _generateReport() async {
+    if (!_formKey.currentState!.validate()) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please complete all required fields')),
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      // Create validation object using your existing form data
+      final validation = ValidatedDataModel(
+        id: widget.assetId ?? DateTime.now().millisecondsSinceEpoch.toString(),
+        name: _nameController.text,
+        valuatorName: _valuatorNameController.text,
+        valuationExecutor: _valuationExecutorController.text,
+        assetType: _selectedAssetType,
+        valuationMethod: _selectedValuationMethod,
+        constructionCosts:
+            _constructionCosts.map((c) => c.toConstructionCost()).toList(),
+        buildingRelatedCosts: _buildingRelatedCosts
+            .map((c) => c.toBuildingRelatedCost())
+            .toList(),
+        totalCostBuildingConstruction: _calculateTotalConstructionCost(),
+        totalBuildingRelatedCost: _calculateTotalRelatedCost(),
+        totalCostBuilding:
+            _calculateTotalConstructionCost() + _calculateTotalRelatedCost(),
+        valuationStatus: _valuationStatus,
+        valuationDate: DateTime.now(),
+        memlcFactor: double.parse(_memlcFactorController.text),
+        currencyFactor: double.parse(_currencyFactorController.text),
+        totalCostAfterRevaluation: _calculateTotalCostAfterRevaluation(),
+      );
+
+      // Generate and save the report
+      final reportService = getIt<ReportService>();
+      final file = await reportService.generateValidationReport(validation);
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Report saved to: ${file.path}'),
+            action: SnackBarAction(
+              label: 'Open',
+              onPressed: () async {
+                final result = await OpenFile.open(file.path);
+                if (result.type != ResultType.done) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                        content: Text('Error opening file: ${result.message}')),
+                  );
+                }
+              },
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error generating report: ${e.toString()}')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -98,6 +170,11 @@ class _ValidationInputScreenState extends State<ValidationInputScreen> {
         title:
             Text(widget.assetId != null ? 'Edit Validation' : 'New Validation'),
         actions: [
+          if (widget.assetId != null) // Only show for existing validations
+            IconButton(
+              icon: const Icon(Icons.picture_as_pdf),
+              onPressed: _generateReport,
+            ),
           IconButton(
             icon: const Icon(Icons.save),
             onPressed: _submitValidation,
@@ -611,7 +688,6 @@ class _ValidationInputScreenState extends State<ValidationInputScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Validation saved successfully')),
           );
-          Navigator.pop(context);
         } else {
           throw Exception('Failed to save validation');
         }

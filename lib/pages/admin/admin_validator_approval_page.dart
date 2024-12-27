@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get_it/get_it.dart';
+import 'package:land_house_verify/pages/admin/userDetailScreen.dart';
 
 import '../../components/show_dialog.dart';
 import '../../model/validator_model.dart';
 
 import '../../services/register_validator_service.dart';
-import 'approval_page.dart';
 
 class AdminValidatorApproval extends StatefulWidget {
   const AdminValidatorApproval({super.key});
@@ -51,43 +51,54 @@ class _AdminValidatorApprovalState extends State<AdminValidatorApproval> {
               final data = validators[index].data() as Map<String, dynamic>;
               final docId = validators[index].id;
 
-              return ListTile(
-                title: Text(data['name']),
-                subtitle: Text('Type: ${data['validatorType']}'),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => UserDetailScreen(
-                        email: data['email'],
+              return Card(
+                margin:
+                    const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                elevation: 5,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.0), // Rounded corners
+                ),
+                child: ListTile(
+                  title: Text(
+                    data['name'],
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  subtitle: Text('Type: ${data['validatorType']}'),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => UserDetailScreen(
+                          email: data['email'],
+                        ),
                       ),
-                    ),
-                  );
-                },
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconButton(
-                        icon: const Icon(Icons.check, color: Colors.green),
+                    );
+                  },
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                          icon: const Icon(Icons.check, color: Colors.green),
+                          onPressed: () async {
+                            if (await showConfirmation.showConfirmationDialog(
+                                context, 'approve')) {
+                              final validator = ValidatorModel.fromMap(
+                                  data); // Convert map to model
+                              showConfirmation.approveValidator(
+                                  context, docId, validator);
+                            }
+                          }),
+                      IconButton(
+                        icon: const Icon(Icons.close, color: Colors.red),
                         onPressed: () async {
                           if (await showConfirmation.showConfirmationDialog(
-                              context, 'approve')) {
-                            final validator = ValidatorModel.fromMap(
-                                data); // Convert map to model
-                            showConfirmation.approveValidator(
-                                context, docId, validator);
+                              context, 'reject')) {
+                            showConfirmation.rejectValidator(context, docId);
                           }
-                        }),
-                    IconButton(
-                      icon: const Icon(Icons.close, color: Colors.red),
-                      onPressed: () async {
-                        if (await showConfirmation.showConfirmationDialog(
-                            context, 'reject')) {
-                          showConfirmation.rejectValidator(context, docId);
-                        }
-                      },
-                    ),
-                  ],
+                        },
+                      ),
+                    ],
+                  ),
                 ),
               );
             },
