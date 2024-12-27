@@ -20,6 +20,7 @@ class _RegisterValidatorPageState extends State<RegisterValidatorPage> {
   String role = '';
   File? cvFile;
   File? certificationFile;
+  bool _isLoading = false;
 
   Future<void> pickFile(bool isCV) async {
     // External storage file picker
@@ -40,8 +41,10 @@ class _RegisterValidatorPageState extends State<RegisterValidatorPage> {
         cvFile != null &&
         certificationFile != null) {
       _formKey.currentState!.save();
-
-      // Save validator data to Firestore
+      setState(() {
+        _isLoading = true; // Show spinner
+      });
+        // Save validator data to Firestore
       final validatorData = {
         'validatorType': validatorType,
         'name': name,
@@ -63,6 +66,9 @@ class _RegisterValidatorPageState extends State<RegisterValidatorPage> {
           content: Text('Registration sent to admin for approval.'),
         ),
       );
+      setState(() {
+      _isLoading = false; // Show spinner
+    });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -78,194 +84,198 @@ class _RegisterValidatorPageState extends State<RegisterValidatorPage> {
       body: SafeArea(
         child: Form(
           key: _formKey,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.app_registration_rounded,
-                size: 100,
-                color: Theme.of(context).colorScheme.inversePrimary,
-              ),
-              SizedBox(
-                height: 25,
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                child: DropdownButtonFormField(
-                  value: validatorType,
-                  decoration: InputDecoration(
-                    labelText: 'Role',
-                    border: OutlineInputBorder(
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.app_registration_rounded,
+                  size: 100,
+                  color: Theme.of(context).colorScheme.inversePrimary,
+                ),
+                SizedBox(
+                  height: 25,
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                  child: DropdownButtonFormField(
+                    value: validatorType,
+                    decoration: InputDecoration(
+                      labelText: 'Role',
+                      border: OutlineInputBorder(
+                          borderSide: BorderSide(
+                              color: Theme.of(context).colorScheme.tertiary)),
+                      focusedBorder: OutlineInputBorder(
                         borderSide: BorderSide(
-                            color: Theme.of(context).colorScheme.tertiary)),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                          color: Theme.of(context).colorScheme.primary),
+                            color: Theme.of(context).colorScheme.primary),
+                      ),
+                    ),
+                    onChanged: (value) => setState(() => validatorType = value!),
+                    items: ['Individual', 'Organization']
+                        .map((type) =>
+                            DropdownMenuItem(value: type, child: Text(type)))
+                        .toList(),
+                  ),
+                ),
+                SizedBox(
+                  height: 25,
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                  child: TextFormField(
+                    obscureText:
+                        false, // If you want to obscure the text (e.g., for passwords)
+                    decoration: InputDecoration(
+                      hintText:
+                          'Name / Organization Name', // Use the appropriate hint text
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Theme.of(context).colorScheme.tertiary,
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
+                    ),
+                    onSaved: (value) {
+                      // Handle saving the value here
+                      name = value!;
+                    },
+                  ),
+                ),
+                SizedBox(
+                  height: 25,
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                  child: TextFormField(
+                    obscureText:
+                        false, // If you want to obscure the text (e.g., for passwords)
+                    decoration: InputDecoration(
+                      hintText: 'Email', // Use the appropriate hint text
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Theme.of(context).colorScheme.tertiary,
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
+                    ),
+                    onSaved: (value) {
+                      // Handle saving the value here
+                      email = value!;
+                    },
+                  ),
+                ),
+                SizedBox(
+                  height: 25,
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                  child: TextFormField(
+                    obscureText:
+                        false, // If you want to obscure the text (e.g., for passwords)
+                    decoration: InputDecoration(
+                      hintText: 'Phone Number', // Use the appropriate hint text
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Theme.of(context).colorScheme.tertiary,
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
+                    ),
+                    onSaved: (value) {
+                      // Handle saving the value here
+                      phoneNumber = value!;
+                    },
+                  ),
+                ),
+                SizedBox(
+                  height: 25,
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                  child: ListTile(
+                    title: Text('Upload CV'),
+                    trailing: Icon(Icons.upload_file),
+                    onTap: () => pickFile(true),
+                  ),
+                ),
+                SizedBox(
+                  height: 25,
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                  child: ListTile(
+                    title: Text('Upload Certification'),
+                    trailing: Icon(Icons.upload_file),
+                    onTap: () => pickFile(false),
+                  ),
+                ),
+                SizedBox(
+                  height: 25,
+                ),
+                //MyButton(onTap: submitForm, text: 'Submit'),
+                _isLoading
+                ? const CircularProgressIndicator():
+                GestureDetector(
+                  onTap: submitForm,
+                  child: Container(
+                    padding: EdgeInsets.all(25),
+                    margin: EdgeInsets.symmetric(horizontal: 25),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.secondary,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Center(
+                      child: Text(
+                        'Submit',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: Theme.of(context).colorScheme.inversePrimary),
+                      ),
                     ),
                   ),
-                  onChanged: (value) => setState(() => validatorType = value!),
-                  items: ['Individual', 'Organization']
-                      .map((type) =>
-                          DropdownMenuItem(value: type, child: Text(type)))
-                      .toList(),
                 ),
-              ),
-              SizedBox(
-                height: 25,
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                child: TextFormField(
-                  obscureText:
-                      false, // If you want to obscure the text (e.g., for passwords)
-                  decoration: InputDecoration(
-                    hintText:
-                        'Name / Organization Name', // Use the appropriate hint text
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Theme.of(context).colorScheme.tertiary,
-                      ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    ),
-                  ),
-                  onSaved: (value) {
-                    // Handle saving the value here
-                    name = value!;
-                  },
+                SizedBox(
+                  height: 25,
                 ),
-              ),
-              SizedBox(
-                height: 25,
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                child: TextFormField(
-                  obscureText:
-                      false, // If you want to obscure the text (e.g., for passwords)
-                  decoration: InputDecoration(
-                    hintText: 'Email', // Use the appropriate hint text
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Theme.of(context).colorScheme.tertiary,
-                      ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    ),
-                  ),
-                  onSaved: (value) {
-                    // Handle saving the value here
-                    email = value!;
-                  },
-                ),
-              ),
-              SizedBox(
-                height: 25,
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                child: TextFormField(
-                  obscureText:
-                      false, // If you want to obscure the text (e.g., for passwords)
-                  decoration: InputDecoration(
-                    hintText: 'Phone Number', // Use the appropriate hint text
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Theme.of(context).colorScheme.tertiary,
-                      ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    ),
-                  ),
-                  onSaved: (value) {
-                    // Handle saving the value here
-                    phoneNumber = value!;
-                  },
-                ),
-              ),
-              SizedBox(
-                height: 25,
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                child: ListTile(
-                  title: Text('Upload CV'),
-                  trailing: Icon(Icons.upload_file),
-                  onTap: () => pickFile(true),
-                ),
-              ),
-              SizedBox(
-                height: 25,
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                child: ListTile(
-                  title: Text('Upload Certification'),
-                  trailing: Icon(Icons.upload_file),
-                  onTap: () => pickFile(false),
-                ),
-              ),
-              SizedBox(
-                height: 25,
-              ),
-              //MyButton(onTap: submitForm, text: 'Submit'),
-              GestureDetector(
-                onTap: () {},
-                child: Container(
-                  padding: EdgeInsets.all(25),
-                  margin: EdgeInsets.symmetric(horizontal: 25),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.secondary,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Center(
-                    child: Text(
-                      'Submit',
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'already Registered',
                       style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
                           color: Theme.of(context).colorScheme.inversePrimary),
                     ),
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 25,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'already Registered',
-                    style: TextStyle(
-                        color: Theme.of(context).colorScheme.inversePrimary),
-                  ),
-                  SizedBox(
-                    width: 4,
-                  ),
-                  GestureDetector(
-                    onTap: widget.onTap,
-                    child: Text(
-                      'Login now',
-                      style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: -1,
-                          color: Theme.of(context).colorScheme.inversePrimary),
+                    SizedBox(
+                      width: 4,
                     ),
-                  )
-                ],
-              )
-            ],
+                    GestureDetector(
+                      onTap: widget.onTap,
+                      child: Text(
+                        'Login now',
+                        style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: -1,
+                            color: Theme.of(context).colorScheme.inversePrimary),
+                      ),
+                    )
+                  ],
+                )
+              ],
+            ),
           ),
         ),
       ),

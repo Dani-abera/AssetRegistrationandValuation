@@ -94,7 +94,7 @@ class _LoginPageState extends State<LoginPage> {
     return WillPopScope(
       onWillPop: () async => false, // Prevent back button action
       child: Scaffold(
-        backgroundColor: Theme.of(context).colorScheme.background,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         body: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [

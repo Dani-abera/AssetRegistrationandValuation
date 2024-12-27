@@ -343,7 +343,7 @@ class _ValidationInputScreenState extends State<ValidationInputScreen> {
                   ),
                 ),
               );
-            }).toList(),
+            }),
           ],
         ),
       ),
@@ -437,7 +437,7 @@ class _ValidationInputScreenState extends State<ValidationInputScreen> {
                   ),
                 ),
               );
-            }).toList(),
+            }),
           ],
         ),
       ),

@@ -10,6 +10,9 @@ class AssetModel {
   final String assetType;
   final String description;
   final String documentUrl;
+  final String validator;
+  final String status;
+  final List<String> assetImage;
   final DateTime createdAt;
 
   AssetModel({
@@ -23,6 +26,9 @@ class AssetModel {
     required this.description,
     required this.documentUrl,
     required this.createdAt,
+    required this.assetImage,
+    required this.status,
+    required this.validator
   });
 
   Map<String, dynamic> toMap() {
@@ -36,6 +42,9 @@ class AssetModel {
       'assetType': assetType,
       'description': description,
       'documentUrl': documentUrl,
+      'validator': validator,
+      'assetImage':assetImage,
+      'status': status,
       'createdAt': FieldValue.serverTimestamp(),
     };
   }
@@ -51,6 +60,9 @@ class AssetModel {
       assetType: map['assetType'] ?? '',
       description: map['description'] ?? '',
       documentUrl: map['documentUrl'] ?? '',
+       assetImage: ['assetImage'], 
+       status: map['status'], 
+       validator: map['validator'],
       createdAt: (map['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
     );
   }

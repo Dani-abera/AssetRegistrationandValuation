@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:land_house_verify/pages/authPage/login_page.dart';
 
 import '../../components/my_button.dart';
 import '../../components/my_textfield.dart';
@@ -67,7 +66,7 @@ class _RegisterPageState extends State<RegisterPage> {
             },
             icon: Icon(Icons.arrow_back)),
       ),
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

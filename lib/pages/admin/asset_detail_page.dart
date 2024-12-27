@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get_it/get_it.dart';
+import 'package:photo_view/photo_view.dart';
 
 import '../../components/my_button.dart';
 import '../../services/asset_register_service.dart';
@@ -24,21 +25,32 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
     _fetchValidators();
   }
 
-  // Fetch available validators from Firestore
   Future<void> _fetchValidators() async {
-    final snapshot = await FirebaseFirestore.instance
-        .collection('users')
-        .where('role', isEqualTo: 'validator')
-        .get();
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .where('role', isEqualTo: 'validator')
+          .get();
 
-    setState(() {
-      validators = snapshot.docs;
-    });
+      setState(() {
+        validators = snapshot.docs;
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error fetching validators: $e')),
+      );
+    }
   }
 
-  // Assign validator to asset
   Future<void> _assignValidator() async {
-    if (selectedValidator != null) {
+    if (selectedValidator == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select a validator')),
+      );
+      return;
+    }
+
+    try {
       await FirebaseFirestore.instance
           .collection('assets')
           .doc(widget.assetId)
@@ -46,16 +58,107 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
         'assignedValidator': selectedValidator,
         'validatorAssignedAt': FieldValue.serverTimestamp(),
       });
-      // Save additional user data (name, role) in Firestore
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Validator assigned successfully')),
       );
-    } else {
+    } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select a validator')),
+        SnackBar(content: Text('Error assigning validator: $e')),
       );
     }
+  }
+
+  Future<void> _deleteAsset(BuildContext context, String assetId) async {
+    final assetRegister = GetIt.instance<AssetRegisterService>();
+    try {
+      final result = await assetRegister.deleteAsset(assetId);
+      if (result == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Asset deleted successfully'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        Navigator.of(context).pop(); // Close the details page
+      } else {
+        throw result;
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to delete asset: $e')),
+      );
+    }
+  }
+
+  void _confirmDelete(BuildContext context, String assetId) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Confirm Delete'),
+        content: const Text('Are you sure you want to delete this item?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              _deleteAsset(context, assetId);
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showImagePreview(String imageUrl) {
+  showDialog(
+    context: context,
+    barrierDismissible: true, // Allows closing by tapping outside the dialog
+    builder: (context) => Dialog(
+      insetPadding: EdgeInsets.zero, // Removes the default padding
+      child: Stack(
+        children: [
+          // Use PhotoView to display and zoom the image
+          PhotoView(
+            imageProvider: NetworkImage(imageUrl),
+            minScale: PhotoViewComputedScale.contained,
+            maxScale: PhotoViewComputedScale.covered,
+            backgroundDecoration: BoxDecoration(
+              color: Colors.black.withOpacity(0.9), // Background color
+            ),
+          ),
+          // A close button at the top right of the image
+          Positioned(
+            top: 20,
+            right: 20,
+            child: IconButton(
+              icon: const Icon(Icons.close, color: Colors.white, size: 30),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+  Widget buildDropdownContainer(Widget child) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(8.0),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.primary,
+          width: 1.5,
+        ),
+      ),
+      child: child,
+    );
   }
 
   @override
@@ -83,115 +186,83 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Asset Info Section
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(16.0),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10.0),
-                    border: Border.all(width: 1.5),
-                  ),
-                  child: Column(
-                    children: [
-                      Text(
-                        'Asset Name: ${data['assetName'].toUpperCase()}',
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        'Asset ID: ${data['assetId']}',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                      ),
-                      Text(
-                        'Ownership: ${data['ownership']}',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                      ),
-                      Text(
-                        'Area: ${data['area']} m²',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                      ),
-                      Text(
-                        'Location: ${data['location']}',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                      ),
-                      Text(
-                        'Title Deed No: ${data['titleDeedNo']}',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                      ),
-                      Text(
-                        'Asset Type: ${data['assetType']}',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Divider(
-                  thickness: 1.5,
-                  color: Theme.of(context).colorScheme.inversePrimary,
-                ),
-                const SizedBox(height: 20),
-
-                // Assign Validator Section
                 Text(
-                  'Assign Validator',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
+                  'Asset Name: ${data['assetName'] ?? 'Unknown'}',
+                  style: const TextStyle(
+                      fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 10),
-                Container(
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.background,
-                    borderRadius: BorderRadius.circular(8.0),
-                    border: Border.all(
-                        color: Theme.of(context).colorScheme.primary,
-                        width: 1.5),
+                SizedBox(
+                  height: 300,
+                  child: ListView.builder(
+                    itemCount: (data['assetImage'] as List?)?.length ?? 0,
+                    scrollDirection: Axis.horizontal,
+                    itemBuilder: (context, index) {
+                      final imageUrl = data['assetImage'][index];
+                      return GestureDetector(
+                        onTap: () => _showImagePreview(imageUrl),
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 8.0),
+                          width: 300,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(15),
+                            border: Border.all(
+                                color:
+                                    Theme.of(context).colorScheme.primary),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(15),
+                            child: Image.network(
+                              imageUrl,
+                              fit: BoxFit.cover,
+                              loadingBuilder:
+                                  (context, child, loadingProgress) {
+                                if (loadingProgress == null) return child;
+                                return const Center(
+                                    child: CircularProgressIndicator());
+                              },
+                              errorBuilder: (context, error, stackTrace) {
+                                return const Center(
+                                  child: Icon(Icons.broken_image, size: 50),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                      );
+                    },
                   ),
-                  child: DropdownButtonFormField(
-                    decoration: InputDecoration(
+                ),
+                const SizedBox(height: 20),
+                Text('Asset ID: ${data['assetId'] ?? 'N/A'}'),
+                Text('Ownership: ${data['ownership'] ?? 'N/A'}'),
+                Text('Area: ${data['area'] ?? 'N/A'} m²'),
+                Text('Location: ${data['location'] ?? 'N/A'}'),
+                Text('Title Deed No: ${data['titleDeedNo'] ?? 'N/A'}'),
+                Text('Asset Type: ${data['assetType'] ?? 'N/A'}'),
+                const SizedBox(height: 20),
+                const Divider(),
+                const SizedBox(height: 20),
+                const Text(
+                  'Assign Validator',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 10),
+                buildDropdownContainer(
+                  DropdownButtonFormField(
+                    decoration: const InputDecoration(
                       labelText: 'Select Validator',
-                      labelStyle: TextStyle(
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
                       border: InputBorder.none,
-                      contentPadding: EdgeInsets.symmetric(horizontal: 10.0),
+                      contentPadding:
+                          EdgeInsets.symmetric(horizontal: 10.0),
                     ),
                     value: selectedValidator,
                     items: validators.map((validator) {
-                      final data = validator.data() as Map<String, dynamic>;
+                      final data =
+                          validator.data() as Map<String, dynamic>;
                       return DropdownMenuItem(
                         value: validator.id,
-                        child: Text(
-                          data['name'],
-                          style: TextStyle(
-                              fontSize: 16,
-                              color: Theme.of(context).colorScheme.primary),
-                        ),
+                        child: Text(data['name'] ?? 'Unknown'),
                       );
                     }).toList(),
                     onChanged: (value) {
@@ -201,13 +272,11 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
                     },
                   ),
                 ),
-                const SizedBox(height: 25),
-
+                const SizedBox(height: 20),
                 MyButton(
-                    text: 'Assign',
-                    onTap: () {
-                      _assignValidator();
-                    }),
+                  text: 'Assign',
+                  onTap: _assignValidator,
+                ),
                 const SizedBox(height: 25),
                 Center(
                   child: ElevatedButton.icon(
@@ -215,7 +284,6 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
                     label: const Text('Delete'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red,
-                      foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(
                           horizontal: 20, vertical: 12),
                       textStyle: const TextStyle(
@@ -224,62 +292,14 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    onPressed: () => _confirmDelete(context, widget.assetId),
+                    onPressed: () =>
+                        _confirmDelete(context, widget.assetId),
                   ),
                 )
               ],
             ),
           );
         },
-      ),
-    );
-  }
-}
-
-void _confirmDelete(BuildContext context, String assetId) {
-  showDialog(
-    context: context,
-    builder: (context) => AlertDialog(
-      title: const Text('Confirm Delete'),
-      content: const Text('Are you sure you want to delete this item?'),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(), // Cancel
-          child: const Text('Cancel'),
-        ),
-        ElevatedButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-            Navigator.of(context).pop();
-
-            _deleteAsset(context, assetId);
-            //onDelete(); // Perform delete action
-          },
-          style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-          child: const Text('Delete'),
-        ),
-      ],
-    ),
-  );
-}
-
-// Call deleteAsset from AssetRegistrationService
-Future<void> _deleteAsset(BuildContext context, String assetId) async {
-  final assetRegister = GetIt.instance<AssetRegisterService>();
-  final result = await assetRegister.deleteAsset(assetId); // Call delete method
-
-  if (result == null) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Asset deleted successfully'),
-        backgroundColor: Colors.green,
-      ),
-    );
-  } else {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Failed to delete asset: $result'),
-        backgroundColor: Colors.red,
       ),
     );
   }

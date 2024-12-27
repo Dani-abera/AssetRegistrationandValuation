@@ -16,6 +16,9 @@ class AssetRegisterService {
     required String assetType,
     required String description,
     required String documentFile,
+    required List<String> assetThumbnails,
+    required String valuator,
+    required String status
   }) async {
     try {
       // 2. Create asset model
@@ -29,6 +32,9 @@ class AssetRegisterService {
         assetType: assetType,
         description: description,
         documentUrl: documentFile,
+        validator: valuator,
+        status: status,
+        assetImage: assetThumbnails,
         createdAt: DateTime.now(),
       );
 
@@ -40,7 +46,6 @@ class AssetRegisterService {
       return e.toString(); // Return error message
     }
   }
-
   // Get all assets
   Stream<List<AssetModel>> getAssets() {
     return _firestore

@@ -1,11 +1,12 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:land_house_verify/components/my_textFormField.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
 import 'package:get_it/get_it.dart';
-
-import '../../services/asset_register_service.dart';
+import 'package:land_house_verify/components/my_textFormField.dart';
+import 'package:land_house_verify/services/asset_register_service.dart';
+import 'package:land_house_verify/services/upload_image.dart';
 
 class RegisterAssetPage extends StatefulWidget {
   const RegisterAssetPage({super.key});
@@ -20,6 +21,7 @@ class _RegisterAssetPageState extends State<RegisterAssetPage> {
       GetIt.instance<AssetRegisterService>(); // Use get_it to locate service
   String? _documentFile;
   bool _isLoading = false;
+  bool _isImagePicked = false;
 
   // Form controllers
   final _assetNameController = TextEditingController();
@@ -30,15 +32,27 @@ class _RegisterAssetPageState extends State<RegisterAssetPage> {
   final _descriptionController = TextEditingController();
 
   String _selectedAssetType = 'Land';
+   List<File> assetThumbnails = [];
+   PlatformFile? pickedImage;
+    XFile? image;
+    List<String> uploadedUrls = [];
+    String? uploadedDocumentUrl;
 
+  /// Pick a document from the device using File Picker
   Future<void> pickDocument() async {
-    final directory = await getExternalStorageDirectory();
-    final file = File('${directory!.path}/asset_doc.pdf');
+      try {
+        final result = await FilePicker.platform.pickFiles(
+          type: FileType.custom,
+          allowedExtensions: ['pdf', 'doc', 'docx'], // Customize allowed file types
+        );
 
-    setState(() {
-      _documentFile = file.path;
-    });
-  }
+        if (result != null) {
+          _documentFile = result.files.single.path;
+        }
+      } catch (e) {
+        print('Error picking document: $e');
+      }
+    }
 
   Future<void> _submitAsset() async {
     if (!_formKey.currentState!.validate() || _documentFile == null) {
@@ -50,6 +64,11 @@ class _RegisterAssetPageState extends State<RegisterAssetPage> {
     }
 
     setState(() => _isLoading = true);
+          uploadedUrls = await uploadMultipleImagesToCloudinary(assetThumbnails);
+          print('Thumbnail selected: $uploadedUrls');
+          uploadedDocumentUrl = await uploadDocumentToCloudinary(_documentFile!);
+          print('Document selected: $uploadedDocumentUrl');
+
 
     try {
       final result = await assetRegister.registerAsset(
@@ -60,13 +79,17 @@ class _RegisterAssetPageState extends State<RegisterAssetPage> {
         titleDeedNumber: _titleDeedController.text,
         assetType: _selectedAssetType,
         description: _descriptionController.text,
-        documentFile: _documentFile!,
+        documentFile: uploadedDocumentUrl!,
+        assetThumbnails: uploadedUrls,
+        valuator: "Not Assigned",
+        status: "In Progress"
       );
 
       if (result == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Asset registered successfully!')),
         );
+        Navigator.pop(context);
       } else {
         throw Exception(result);
       }
@@ -77,6 +100,33 @@ class _RegisterAssetPageState extends State<RegisterAssetPage> {
     } finally {
       setState(() => _isLoading = false);
     }
+  }
+  // Image picker for thumbnails
+  Future<void> _pickThumbnail() async {
+     try {
+    // Open the file picker to select image files
+    final image = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['jpg', 'jpeg', 'png'], // Restrict to image formats
+    );
+
+    if (image != null) {
+      final String? imagePath = image.files.single.path;
+      if (imagePath != null) {
+        setState(() {
+          assetThumbnails.add(File(imagePath));
+        _isImagePicked = true;
+        });
+            // Use the selected image path for your app's functionality
+          } else {
+            print('No file selected');
+          }
+        } else {
+          print('User canceled the picker');
+        }
+      } catch (e) {
+        print('Error picking image: $e');
+      }
   }
 
   @override
@@ -91,6 +141,8 @@ class _RegisterAssetPageState extends State<RegisterAssetPage> {
             child: SingleChildScrollView(
               child: Column(
                 children: [
+                  _buildThumbnailsSection(),
+              const SizedBox(height: 16.0),
                   MyTextformfield(
                     label: 'Name of Asset',
                     controller: _assetNameController,
@@ -139,6 +191,55 @@ class _RegisterAssetPageState extends State<RegisterAssetPage> {
           ),
         ),
       ),
+    );
+  }
+  // Thumbnails Section
+  Widget _buildThumbnailsSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text('Asset Thumbnails', style: TextStyle(fontSize: 16.0)),
+        const SizedBox(height: 8.0),
+        Stack(
+          children: [
+            Container(
+              height: 100,
+              width: double.infinity,
+              decoration: BoxDecoration(border: Border.all(), borderRadius: BorderRadius.circular(8.0)),
+              child:ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: assetThumbnails.length,
+                itemBuilder: (context, index) {
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 10.0),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(8.0),
+                      child: Image.file(
+                        assetThumbnails[index],
+                        width: 100,
+                        height: 100,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            Positioned(
+              bottom: 5, 
+              right: 5,
+              child: GestureDetector(
+                onTap: _pickThumbnail,
+                child: CircleAvatar(
+                  
+                  child: Icon(Icons.upload),
+                ),
+              )
+            ),
+          ],
+        ),
+      
+      ],
     );
   }
 }
