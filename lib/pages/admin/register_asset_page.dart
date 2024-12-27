@@ -5,7 +5,7 @@ import 'dart:io';
 
 import 'package:get_it/get_it.dart';
 
-import '../services/asset_register_service.dart';
+import '../../services/asset_register_service.dart';
 
 class RegisterAssetPage extends StatefulWidget {
   const RegisterAssetPage({super.key});

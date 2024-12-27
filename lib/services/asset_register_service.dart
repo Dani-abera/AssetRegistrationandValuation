@@ -82,6 +82,24 @@ class AssetRegisterService {
     }
   }
 
+  Stream<List<AssetModel>> getAssetsWithoutValidation() {
+    return _firestore
+        .collection('assets')
+        .where('hasValidation', isEqualTo: false)
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+            .map((doc) => AssetModel.fromMap(doc.data(), doc.id))
+            .toList());
+  }
+
+  Future<void> updateAssetValidationStatus(
+      String assetId, bool hasValidation) async {
+    await _firestore
+        .collection('assets')
+        .doc(assetId)
+        .update({'hasValidation': hasValidation});
+  }
+
   // Delete asset
   Future<String?> deleteAsset(String assetId) async {
     try {

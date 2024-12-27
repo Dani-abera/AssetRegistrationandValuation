@@ -3,9 +3,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart';
 
-import '../components/show_dialog.dart';
-import '../model/validator_model.dart';
-import '../services/register_validator_service.dart';
+import '../../components/show_dialog.dart';
+import '../../model/validator_model.dart';
+import '../../services/register_validator_service.dart';
 
 class UserDetailScreen extends StatefulWidget {
   final String email; // Email to fetch user data

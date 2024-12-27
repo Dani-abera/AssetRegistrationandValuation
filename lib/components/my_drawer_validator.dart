@@ -1,9 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:land_house_verify/pages/registration_page.dart';
+import 'package:land_house_verify/pages/authPage/registration_page.dart';
 import 'package:land_house_verify/pages/setting_page.dart';
-import 'package:land_house_verify/pages/valuation_Input_page.dart';
-import '../pages/register_asset_page.dart';
+import 'package:land_house_verify/pages/validator/valuation_Input_page.dart';
+import '../pages/validator/Valiuated_asset_view_page.dart';
 import '../services/login_or_register.dart';
 import 'my_drawer_tile.dart';
 
@@ -51,12 +51,12 @@ class MyDrawerValidator extends StatelessWidget {
             text: 'E V A L U A T I O N',
             icon: Icons.input_rounded,
             onTap: () {
-              //Navigator.push(
-              //   context,
-              //   MaterialPageRoute(
-              //     builder: (context) => AssetValuationForm(),
-              //   ),
-              // );
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ValidationInputScreen(),
+                ),
+              );
             },
           ),
           MyDrawerTile(
@@ -66,7 +66,7 @@ class MyDrawerValidator extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => RegisterAssetPage(),
+                  builder: (context) => ValidationScreen(),
                 ),
               );
             },

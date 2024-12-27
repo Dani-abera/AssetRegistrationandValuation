@@ -19,6 +19,6 @@ void setupLocator() {
   getIt.registerLazySingleton<ShowConfirmationDialogClass>(
       () => ShowConfirmationDialogClass());
   getIt.registerLazySingleton<ValidationService>(
-    () => ValidationService(firestore: getIt<FirebaseFirestore>()),
+    () => ValidationService(),
   );
 }

@@ -2,11 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../model/validated_data_model.dart';
 
 class ValidationService {
-  final FirebaseFirestore _firestore;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   static const String _collection = 'validations';
-
-  ValidationService({required FirebaseFirestore firestore})
-      : _firestore = firestore;
 
   // Create new validation
   Future<String?> createValidation(ValidatedDataModel validation) async {

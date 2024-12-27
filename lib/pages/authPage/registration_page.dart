@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:land_house_verify/pages/login_page.dart';
+import 'package:land_house_verify/pages/authPage/login_page.dart';
 
-import '../components/my_button.dart';
-import '../components/my_textfield.dart';
-import '../services/auth_service.dart';
+import '../../components/my_button.dart';
+import '../../components/my_textfield.dart';
+import '../../services/auth_service.dart';
 
 class RegisterPage extends StatefulWidget {
   final Function()? onTap;

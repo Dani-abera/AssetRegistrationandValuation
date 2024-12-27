@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get_it/get_it.dart';
 
-import '../components/show_dialog.dart';
-import '../model/validator_model.dart';
+import '../../components/show_dialog.dart';
+import '../../model/validator_model.dart';
 
-import '../services/register_validator_service.dart';
+import '../../services/register_validator_service.dart';
 import 'approval_page.dart';
 
 class AdminValidatorApproval extends StatefulWidget {

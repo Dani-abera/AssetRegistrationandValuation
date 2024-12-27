@@ -1,9 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:land_house_verify/pages/registration_page.dart';
+import 'package:land_house_verify/pages/authPage/registration_page.dart';
 import 'package:land_house_verify/pages/setting_page.dart';
-import '../pages/admin_validator_approval_page.dart';
-import '../pages/register_asset_page.dart';
+import '../pages/admin/admin_validator_approval_page.dart';
+import '../pages/admin/register_asset_page.dart';
 import '../services/login_or_register.dart';
 import 'my_drawer_tile.dart';
 

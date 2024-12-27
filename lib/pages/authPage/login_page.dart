@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:land_house_verify/pages/validator_page.dart';
-import '../components/my_button.dart';
-import '../components/my_textfield.dart';
-import '../services/auth_service.dart';
-import 'admin_page.dart';
+import 'package:land_house_verify/pages/validator/validator_page.dart';
+import '../../components/my_button.dart';
+import '../../components/my_textfield.dart';
+import '../../services/auth_service.dart';
+import '../admin/admin_page.dart';
 
 class LoginPage extends StatefulWidget {
   final Function()? onTap;
