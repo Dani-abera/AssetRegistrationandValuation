@@ -115,16 +115,13 @@ class _LoginPageState extends State<LoginPage> {
             MyTextField(
               controller: _emailController,
               hintText: "Email",
-              obscureText: false,
             ),
             SizedBox(height: 25),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 25.0),
-              child: TextField(
-                controller: _passwordController,
-                obscureText: isPasswordHidden,
-                decoration: InputDecoration(
-                  suffixIcon: IconButton(
+            MyTextField(
+              controller: _passwordController,
+              hintText: "Password",
+              obscureText: true,
+              suffixIcon: IconButton(
                     onPressed: () {
                       setState(() {
                         isPasswordHidden = !isPasswordHidden;
@@ -136,20 +133,9 @@ class _LoginPageState extends State<LoginPage> {
                           : Icons.visibility,
                     ),
                   ),
-                  hintText: 'Password',
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: Theme.of(context).colorScheme.tertiary,
-                    ),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                  ),
-                ),
-              ),
+           
             ),
+            SizedBox(height: 25),
             SizedBox(height: 25),
             _isLoading
                 ? const CircularProgressIndicator()
