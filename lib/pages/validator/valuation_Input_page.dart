@@ -11,8 +11,8 @@ import 'construction_cost_controller.dart';
 
 class ValidationInputScreen extends StatefulWidget {
   final String? assetId; // Optional - for editing existing validation
-
-  const ValidationInputScreen({super.key, this.assetId});
+  final Map<String, dynamic>? assetInfo;
+  const ValidationInputScreen({super.key, this.assetId, this.assetInfo});
 
   @override
   State<ValidationInputScreen> createState() => _ValidationInputScreenState();
@@ -44,13 +44,20 @@ class _ValidationInputScreenState extends State<ValidationInputScreen> {
   @override
   void initState() {
     super.initState();
+    _nameController.text = widget.assetInfo!['assetName'] ?? '';
+    _valuatorNameController.text = widget.assetInfo!['validator'] ?? '';
+    _selectedAssetType = widget.assetInfo!['assetType'] ?? '';
+    
     _addInitialCosts();
     _loadExistingData();
   }
 
   void _addInitialCosts() {
     // Add initial empty construction cost
-    _constructionCosts.add(ConstructionCostController());
+    var constructionCostController = ConstructionCostController();
+    constructionCostController.descriptionController.text = widget.assetInfo!['description'] ?? '';
+    _constructionCosts.add(constructionCostController);
+    
     // Add initial empty building related cost
     _buildingRelatedCosts.add(BuildingRelatedCostController());
   }
@@ -458,6 +465,7 @@ class _ValidationInputScreenState extends State<ValidationInputScreen> {
             ),
             const SizedBox(height: 16),
             TextFormField(
+              
               controller: _nameController,
               decoration: const InputDecoration(
                 labelText: 'Asset Name',

@@ -171,7 +171,9 @@ class _RegisterAssetPageState extends State<RegisterAssetPage> {
                       controller: _titleDeedController),
                   MyTextformfield(
                       label: 'Asset Description',
-                      controller: _descriptionController),
+                      controller: _descriptionController,
+                      length: 3,
+                      ),
                   const SizedBox(height: 20),
                   DropdownButtonFormField(
                     value: _selectedAssetType,

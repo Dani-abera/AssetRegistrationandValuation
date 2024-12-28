@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:land_house_verify/components/my_drawer_validator.dart';
-import 'package:land_house_verify/pages/validator/asset_detail.dart';
+import 'package:land_house_verify/pages/validator/validator_asset_detail.dart';
 
 class ValidatorPage extends StatefulWidget {
   final String name;  // Current validator's name
@@ -37,6 +37,7 @@ class _ValidatorPageState extends State<ValidatorPage> {
 
           if (assets.isEmpty) {
             return const Center(child: Text('No assets found for you'));
+
           }
 
           return ListView.builder(
@@ -44,7 +45,6 @@ class _ValidatorPageState extends State<ValidatorPage> {
             itemBuilder: (context, index) {
               final data = assets[index].data() as Map<String, dynamic>;
               final docId = assets[index].id;
-
               final assetImage = (data['assetImage'] as List?)?.first ?? '';
               final assetName = data['assetName'] ?? 'Unknown Asset';
               final ownership = data['ownership'] ?? 'Unknown Owner';
