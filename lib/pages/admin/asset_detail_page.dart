@@ -21,6 +21,8 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
   String? selectedValidator;
   List<DocumentSnapshot> validators = [];
   String? validatorName;
+  bool validatorAssigned=false;
+
 
   @override
   void initState() {
@@ -87,6 +89,9 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Validator assigned successfully')),
       );
+      setState(() {
+        validatorAssigned = false;
+      });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error assigning validator: $e')),
@@ -259,23 +264,25 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                Text('Asset ID: ${data['assetId'] ?? 'N/A'}'),
+                Text('Asset ID: ${widget.assetId}'),
                 Text('Ownership: ${data['ownership'] ?? 'N/A'}'),
                 Text('Area: ${data['area'] ?? 'N/A'} m²'),
                 Text('Location: ${data['location'] ?? 'N/A'}'),
-                Text('Title Deed No: ${data['titleDeedNo'] ?? 'N/A'}'),
+                Text('Title Deed No: ${data['titleDeedNumber'] ?? 'N/A'}'),
                 Text('Asset Type: ${data['assetType'] ?? 'N/A'}'),
-                Text('Asset Validator: $validatorName'),
+                Text('Asset Validator: ${data['validator'] ?? 'N/A'}'),
                 Text('Validation Status: ${data['status'] ?? 'N/A'}'),
                 const SizedBox(height: 20),
                 const Divider(),
                 const SizedBox(height: 20),
-                const Text(
+                
+                validatorAssigned? Column(children: [
+                  const Text(
                   'Assign Validator',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 10),
-                buildDropdownContainer(
+                  buildDropdownContainer(
                   DropdownButtonFormField(
                     decoration: const InputDecoration(
                       labelText: 'Select Validator',
@@ -304,6 +311,12 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
                   text: 'Assign',
                   onTap: _assignValidator,
                 ),
+               
+              ],):Center(child: ElevatedButton(onPressed: (){ 
+                setState(() {
+                  validatorAssigned = true;
+                });
+              }, child: Text("Change Validator")),),
                 const SizedBox(height: 25),
                 Center(
                   child: ElevatedButton.icon(
