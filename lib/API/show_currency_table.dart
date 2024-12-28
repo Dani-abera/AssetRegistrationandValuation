@@ -1,6 +1,6 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'fetch_exchange_rate.dart';
 
 class CurrencyConverterToETB extends StatefulWidget {
   const CurrencyConverterToETB({super.key});
@@ -25,22 +25,10 @@ class CurrencyConverterToETBState extends State<CurrencyConverterToETB> {
   }
 
   Future<void> fetchExchangeRates() async {
-    const String apiUrl = 'https://open.er-api.com/v6/latest/USD'; // Example API
-
-    try {
-      final response = await http.get(Uri.parse(apiUrl));
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        setState(() {
-          exchangeRates = data['rates'];
-          isLoading = false;
-        });
-      } else {
-        print('Failed to load exchange rates. Status code: ${response.statusCode}');
-      }
-    } catch (e) {
-      print('Error fetching data: $e');
-    }
+    exchangeRates = await FetchExchangeRate.getExchangeRates();
+    setState(() {
+      isLoading = false;
+    });
   }
 
   @override
@@ -94,29 +82,38 @@ class CurrencyConverterToETBState extends State<CurrencyConverterToETB> {
                       children: [
                         TableRow(
                           children: [
-                            TableCell(child: Text('Currency', style: TextStyle(fontWeight: FontWeight.bold))),
-                            TableCell(child: Text('Converted Value in ETB', style: TextStyle(fontWeight: FontWeight.bold))),
+                            TableCell(child: Align(alignment:Alignment.center, child:  Text('Currency', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17)))),
+                            TableCell(child: Align(alignment:Alignment.center, child:  Text('ETB', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17)))),
                           ],
                         ),
                         // Display conversion for each currency in currencyList
                         for (String currency in currencyList)
                           TableRow(
                             children: [
-                              TableCell(child: Text('$amount $currency')),
                               TableCell(
-                                child: Text(
-                                  '${(amount / exchangeRates![currency]!.toDouble()) * exchangeRates!['ETB']!.toDouble()} ETB',
-                                  style: TextStyle(fontSize: 16.0),
+                                child: Align(
+                                  alignment: Alignment.center,
+                                  child: Text('$amount $currency'),
+                                ),
+                              ),
+                              TableCell(
+                                child: Align(
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    '${((amount / exchangeRates![currency]!.toDouble()) * exchangeRates!['ETB']!.toDouble()).toStringAsFixed(3)} ETB',
+                                    style: TextStyle(fontSize: 16.0),
+                                  ),
                                 ),
                               ),
                             ],
                           ),
                       ],
                     ),
+                    SizedBox(height: 10),
+                    Center(child: ElevatedButton(onPressed: () {}, child: Text("Save"))),
                   ],
                 ),
-              SizedBox(height: 10),
-              Center(child: ElevatedButton(onPressed: () {}, child: Text("Save"))),
+              
             ],
           ),
         ),
