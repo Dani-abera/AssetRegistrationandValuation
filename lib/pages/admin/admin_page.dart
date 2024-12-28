@@ -12,6 +12,7 @@ class AdminPage extends StatefulWidget {
 }
 
 class _AdminPageState extends State<AdminPage> {
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,6 +20,7 @@ class _AdminPageState extends State<AdminPage> {
       appBar: AppBar(
         title: Text('Welcome, ${widget.name.toUpperCase()}',style: TextStyle(color: Colors.black),),
         backgroundColor: Colors.transparent,
+        
       ),
       body: StreamBuilder(
         stream: FirebaseFirestore.instance.collection('assets').snapshots(),
@@ -117,7 +119,8 @@ class _AdminPageState extends State<AdminPage> {
                             borderRadius: BorderRadius.circular(5),
                             color: const Color.fromARGB(255, 207, 209, 214)
                           ),
-                          child: Text(' ${data['validator']}'),)
+                          child: Text(' ${data['status']}'),)
+                          
                       ],),
                       const SizedBox(height: 15,),
                       Container(

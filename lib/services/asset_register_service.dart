@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 
 import '../model/asset_model.dart';
 
@@ -68,7 +69,9 @@ class AssetRegisterService {
       }
       return null;
     } catch (e) {
-      print('Error fetching asset: $e');
+      if (kDebugMode) {
+        print('Error fetching asset: $e');
+      }
       return null;
     }
   }
@@ -109,8 +112,6 @@ class AssetRegisterService {
   Future<String?> deleteAsset(String assetId) async {
     try {
       // Get asset data to delete document from storage
-      final asset = await getAsset(assetId);
-
       // Delete from Firestore
       await _firestore.collection('assets').doc(assetId).delete();
       return null; // Success

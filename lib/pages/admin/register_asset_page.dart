@@ -1,4 +1,7 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
@@ -21,7 +24,6 @@ class _RegisterAssetPageState extends State<RegisterAssetPage> {
       GetIt.instance<AssetRegisterService>(); // Use get_it to locate service
   String? _documentFile;
   bool _isLoading = false;
-  bool _isImagePicked = false;
 
   // Form controllers
   final _assetNameController = TextEditingController();
@@ -50,7 +52,9 @@ class _RegisterAssetPageState extends State<RegisterAssetPage> {
           _documentFile = result.files.single.path;
         }
       } catch (e) {
-        print('Error picking document: $e');
+        if (kDebugMode) {
+          print('Error picking document: $e');
+        }
       }
     }
 
@@ -65,9 +69,13 @@ class _RegisterAssetPageState extends State<RegisterAssetPage> {
 
     setState(() => _isLoading = true);
           uploadedUrls = await uploadMultipleImagesToCloudinary(assetThumbnails);
-          print('Thumbnail selected: $uploadedUrls');
+          if (kDebugMode) {
+            print('Thumbnail selected: $uploadedUrls');
+          }
           uploadedDocumentUrl = await uploadDocumentToCloudinary(_documentFile!);
-          print('Document selected: $uploadedDocumentUrl');
+          if (kDebugMode) {
+            print('Document selected: $uploadedDocumentUrl');
+          }
 
 
     try {
@@ -115,17 +123,22 @@ class _RegisterAssetPageState extends State<RegisterAssetPage> {
       if (imagePath != null) {
         setState(() {
           assetThumbnails.add(File(imagePath));
-        _isImagePicked = true;
         });
             // Use the selected image path for your app's functionality
           } else {
-            print('No file selected');
+            if (kDebugMode) {
+              print('No file selected');
+            }
           }
         } else {
-          print('User canceled the picker');
+          if (kDebugMode) {
+            print('User canceled the picker');
+          }
         }
       } catch (e) {
-        print('Error picking image: $e');
+        if (kDebugMode) {
+          print('Error picking image: $e');
+        }
       }
   }
 

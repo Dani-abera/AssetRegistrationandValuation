@@ -68,111 +68,113 @@ class _RegisterPageState extends State<RegisterPage> {
       ),
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              "Let's Create Account",
-              style: TextStyle(
-                  fontSize: 16,
-                  color: Theme.of(context).colorScheme.inversePrimary),
-            ),
-            SizedBox(
-              height: 25,
-            ),
-            MyTextField(
-              controller: _nameController,
-              hintText: "Name",
-              obscureText: false,
-            ),
-            SizedBox(
-              height: 25,
-            ),
-            MyTextField(
-              controller: _emailController,
-              hintText: "Email",
-              obscureText: false,
-            ),
-            SizedBox(
-              height: 25,
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 25.0),
-              child: TextField(
-                controller: _passwordController,
-                obscureText: isPasswordHidden,
-                decoration: InputDecoration(
-                  suffixIcon: IconButton(
-                    onPressed: () {
-                      setState(() {
-                        isPasswordHidden = !isPasswordHidden;
-                      });
-                    },
-                    icon: Icon(
-                      isPasswordHidden
-                          ? Icons.visibility_off
-                          : Icons.visibility,
-                    ),
-                  ),
-                  hintText: 'Password',
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                        color: Theme.of(context).colorScheme.tertiary),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                        color: Theme.of(context).colorScheme.primary),
-                  ),
-                ),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                "Let's Create Account",
+                style: TextStyle(
+                    fontSize: 16,
+                    color: Theme.of(context).colorScheme.inversePrimary),
               ),
-            ),
-            SizedBox(
-              height: 25,
-            ),
-            // Dropdown for selecting role
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 25.0),
-              child: DropdownButtonFormField<String>(
-                value: _selectedRole,
-                decoration: InputDecoration(
-                  labelText: 'Role',
-                  border: OutlineInputBorder(
+              SizedBox(
+                height: 25,
+              ),
+              MyTextField(
+                controller: _nameController,
+                hintText: "Name",
+                obscureText: false,
+              ),
+              SizedBox(
+                height: 25,
+              ),
+              MyTextField(
+                controller: _emailController,
+                hintText: "Email",
+                obscureText: false,
+              ),
+              SizedBox(
+                height: 25,
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                child: TextField(
+                  controller: _passwordController,
+                  obscureText: isPasswordHidden,
+                  decoration: InputDecoration(
+                    suffixIcon: IconButton(
+                      onPressed: () {
+                        setState(() {
+                          isPasswordHidden = !isPasswordHidden;
+                        });
+                      },
+                      icon: Icon(
+                        isPasswordHidden
+                            ? Icons.visibility_off
+                            : Icons.visibility,
+                      ),
+                    ),
+                    hintText: 'Password',
+                    enabledBorder: OutlineInputBorder(
                       borderSide: BorderSide(
-                          color: Theme.of(context).colorScheme.tertiary)),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                        color: Theme.of(context).colorScheme.primary),
-                  ),
-                ),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    _selectedRole = newValue!; // Update role selection
-                  });
-                },
-                items: ['Admin', 'validator'].map((role) {
-                  return DropdownMenuItem(
-                    value: role,
-                    child: Text(role),
-                  );
-                }).toList(),
-              ),
-            ),
-            SizedBox(
-              height: 25,
-            ),
-            _isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : SizedBox(
-                    width: double.infinity, // Button stretches across width
-                    child: MyButton(
-                      onTap: _signup, // Call signup function
-                      text: 'Signup',
+                          color: Theme.of(context).colorScheme.tertiary),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                          color: Theme.of(context).colorScheme.primary),
                     ),
                   ),
-            SizedBox(
-              height: 25,
-            ),
-          ],
+                ),
+              ),
+              SizedBox(
+                height: 25,
+              ),
+              // Dropdown for selecting role
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                child: DropdownButtonFormField<String>(
+                  value: _selectedRole,
+                  decoration: InputDecoration(
+                    labelText: 'Role',
+                    border: OutlineInputBorder(
+                        borderSide: BorderSide(
+                            color: Theme.of(context).colorScheme.tertiary)),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                          color: Theme.of(context).colorScheme.primary),
+                    ),
+                  ),
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      _selectedRole = newValue!; // Update role selection
+                    });
+                  },
+                  items: ['Admin', 'validator'].map((role) {
+                    return DropdownMenuItem(
+                      value: role,
+                      child: Text(role),
+                    );
+                  }).toList(),
+                ),
+              ),
+              SizedBox(
+                height: 25,
+              ),
+              _isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : SizedBox(
+                      width: double.infinity, // Button stretches across width
+                      child: MyButton(
+                        onTap: _signup, // Call signup function
+                        text: 'Signup',
+                      ),
+                    ),
+              SizedBox(
+                height: 25,
+              ),
+            ],
+          ),
         ),
       ),
     );

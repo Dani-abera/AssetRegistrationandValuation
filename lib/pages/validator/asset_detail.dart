@@ -1,12 +1,8 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:get_it/get_it.dart';
+import 'package:land_house_verify/pages/validator/valuation_Input_page.dart';
 import 'package:photo_view/photo_view.dart';
 
-import '../../components/my_button.dart';
-import '../../services/asset_register_service.dart';
 
 class AssetDetailPage extends StatefulWidget {
   final String assetId;
@@ -45,100 +41,8 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
     }
   }
 
-  Future<void> _fetchValidatorName(String validatorId) async {
-    try {
-      final snapshot = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(validatorId)
-          .get();
 
-      if (snapshot.exists) {
-        setState(() {
-          validatorName = snapshot.data()?['name'] ?? 'Unknown';
-        });
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error fetching validator name: $e')),
-      );
-    }
-  }
 
-  Future<void> _assignValidator() async {
-    if (selectedValidator == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select a validator')),
-      );
-      return;
-    }
-
-    try {
-      await _fetchValidatorName(selectedValidator!); // Fetch name before assignment
-
-      await FirebaseFirestore.instance
-          .collection('assets')
-          .doc(widget.assetId)
-          .update({
-        'validator': validatorName,  // Make sure to assign the name or ID of the validator
-        'assignedValidator': selectedValidator,
-        'validatorAssignedAt': FieldValue.serverTimestamp(),
-      });
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Validator assigned successfully')),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error assigning validator: $e')),
-      );
-    }
-  }
-
-  Future<void> _deleteAsset(BuildContext context, String assetId) async {
-    final assetRegister = GetIt.instance<AssetRegisterService>();
-    try {
-      final result = await assetRegister.deleteAsset(assetId);
-      if (result == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Asset deleted successfully'),
-            backgroundColor: Colors.green,
-          ),
-        );
-        Navigator.of(context).pop(); // Close the details page
-      } else {
-        throw result;
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to delete asset: $e')),
-      );
-    }
-  }
-
-  void _confirmDelete(BuildContext context, String assetId) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Confirm Delete'),
-        content: const Text('Are you sure you want to delete this item?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              _deleteAsset(context, assetId);
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('Delete'),
-          ),
-        ],
-      ),
-    );
-  }
 
   void _showImagePreview(String imageUrl) {
     showDialog(
@@ -270,59 +174,31 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
                 const SizedBox(height: 20),
                 const Divider(),
                 const SizedBox(height: 20),
-                const Text(
-                  'Assign Validator',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                Container(
+                height: 40, 
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(5), 
+                  gradient: const LinearGradient(colors: [
+                    Colors.lightGreen,
+                    Colors.greenAccent
+                  ])
                 ),
-                const SizedBox(height: 10),
-                buildDropdownContainer(
-                  DropdownButtonFormField(
-                    decoration: const InputDecoration(
-                      labelText: 'Select Validator',
-                      border: InputBorder.none,
-                      contentPadding:
-                          EdgeInsets.symmetric(horizontal: 10.0),
+                child: ElevatedButton(onPressed: (){
+                  // Navigate to detailed asset page
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>ValidationInputScreen(assetId:'1'), //AssetDetailPage(assetId: docId),
                     ),
-                    value: selectedValidator,
-                    items: validators.map((validator) {
-                      final data =
-                          validator.data() as Map<String, dynamic>;
-                      return DropdownMenuItem(
-                        value: validator.id,
-                        child: Text(data['name'] ?? 'Unknown'),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        selectedValidator = value;
-                      });
-                    },
-                  ),
-                ),
-                const SizedBox(height: 20),
-                MyButton(
-                  text: 'Assign',
-                  onTap: _assignValidator,
-                ),
-                const SizedBox(height: 25),
-                Center(
-                  child: ElevatedButton.icon(
-                    icon: const Icon(Icons.delete, color: Colors.white),
-                    label: const Text('Delete'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 12),
-                      textStyle: const TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.bold),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    onPressed: () =>
-                        _confirmDelete(context, widget.assetId),
-                  ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  shadowColor: Colors.transparent,
+                  backgroundColor: Colors.transparent
+                ), child: Text("Valuate this Asset", style: TextStyle(color: Colors.white,fontSize: 17, fontWeight: FontWeight.bold),),
                 )
+              ),
               ],
             ),
           );

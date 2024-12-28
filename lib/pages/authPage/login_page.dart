@@ -1,4 +1,7 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:land_house_verify/pages/validator/validator_page.dart';
 import '../../components/my_button.dart';
@@ -16,32 +19,30 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final AuthService _authService = AuthService(); // Instance of AuthService
-// Controller for email input
-  final _emailController = TextEditingController();
-  // Controller for password input
-  final _passwordController = TextEditingController();
-  // To show spinner during login
-  bool _isLoading = false;
+  final _emailController = TextEditingController(); // Controller for email input
+  final _passwordController = TextEditingController(); // Controller for password input
+  bool _isLoading = false; // To show spinner during login
 
-  Future<String> _fetchName() async {
+  // Function to fetch the id of the user (both Admin and Validator)
+  Future<String> _fetchUserId() async {
     try {
-      // Assuming the email is used as the document ID or is a field in the 'users' collection
+      // Assuming the email is used as the document ID or a unique field in the 'users' collection
       QuerySnapshot userSnapshot = await FirebaseFirestore.instance
           .collection('users')
           .where('email', isEqualTo: _emailController.text)
           .get();
 
       if (userSnapshot.docs.isNotEmpty) {
-        // If the user is found, get their name from the document
-        return userSnapshot
-            .docs.first['name']; // Assuming the 'name' field is present
+        // Fetch the 'id' field for both Admin and Validator
+        return userSnapshot.docs.first['name'] ?? 'Unknown';
       } else {
-        // Return an empty string or handle the error case
-        return 'Unknown';
+        return 'Unknown'; // Return a default value if not found
       }
     } catch (e) {
-      print('Error fetching admin name: $e');
-      return 'Unknown'; // Return a default value in case of an error
+      if (kDebugMode) {
+        print('Error fetching user id: $e');
+      }
+      return 'Unknown'; // Return default value in case of error
     }
   }
 
@@ -63,21 +64,19 @@ class _LoginPageState extends State<LoginPage> {
 
     // Navigate based on role or show error message
     if (result == 'Admin') {
-      String adminName = await _fetchName();
+      String adminId = await _fetchUserId(); // Fetch admin's id
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (_) => AdminPage(
-            name: adminName,
-          ),
+          builder: (_) => AdminPage(name: adminId,), // Pass id to AdminPage
         ),
       );
     } else if (result == 'validator') {
-      String validatorName = await _fetchName();
+      String validatorId = await _fetchUserId(); // Fetch validator's id
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (_) => ValidatorPage(name: validatorName),
+          builder: (_) => ValidatorPage(name: validatorId), // Pass id to ValidatorPage
         ),
       );
     } else {
@@ -91,6 +90,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    // ignore: deprecated_member_use
     return WillPopScope(
       onWillPop: () async => false, // Prevent back button action
       child: Scaffold(
@@ -103,31 +103,26 @@ class _LoginPageState extends State<LoginPage> {
               size: 100,
               color: Theme.of(context).colorScheme.inversePrimary,
             ),
-            SizedBox(
-              height: 25,
-            ),
+            SizedBox(height: 25),
             Text(
               "Land and House Registration and Validation System",
               style: TextStyle(
-                  fontSize: 16,
-                  color: Theme.of(context).colorScheme.inversePrimary),
+                fontSize: 16,
+                color: Theme.of(context).colorScheme.inversePrimary,
+              ),
             ),
-            SizedBox(
-              height: 25,
-            ),
+            SizedBox(height: 25),
             MyTextField(
               controller: _emailController,
               hintText: "Email",
               obscureText: false,
             ),
-            SizedBox(
-              height: 25,
-            ),
+            SizedBox(height: 25),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 25.0),
               child: TextField(
                 controller: _passwordController,
-                obscureText: isPasswordHidden, // Use visibility state here
+                obscureText: isPasswordHidden,
                 decoration: InputDecoration(
                   suffixIcon: IconButton(
                     onPressed: () {
@@ -155,40 +150,36 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
             ),
-            SizedBox(
-              height: 25,
-            ),
+            SizedBox(height: 25),
             _isLoading
                 ? const CircularProgressIndicator()
                 : SizedBox(
                     width: double.infinity,
                     child: MyButton(onTap: _login, text: "Login"),
                   ),
-            SizedBox(
-              height: 25,
-            ),
+            SizedBox(height: 25),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
                   'not a member?',
                   style: TextStyle(
-                      color: Theme.of(context).colorScheme.inversePrimary),
+                    color: Theme.of(context).colorScheme.inversePrimary,
+                  ),
                 ),
-                SizedBox(
-                  width: 4,
-                ),
+                SizedBox(width: 4),
                 GestureDetector(
                   onTap: widget.onTap,
                   child: Text(
                     'Register as Validator',
                     style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.inversePrimary),
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.inversePrimary,
+                    ),
                   ),
-                )
+                ),
               ],
-            )
+            ),
           ],
         ),
       ),

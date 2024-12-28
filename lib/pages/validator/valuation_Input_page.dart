@@ -1,5 +1,6 @@
+// ignore_for_file: file_names, use_build_context_synchronously
+
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:open_file/open_file.dart';
 import '../../model/validated_data_model.dart';
 import '../../service_locator.dart';
@@ -519,49 +520,6 @@ class _ValidationInputScreenState extends State<ValidationInputScreen> {
     );
   }
 
-  Widget _buildConstructionCostItem(ConstructionCostController controller) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: Column(
-        children: [
-          TextFormField(
-            controller: controller.descriptionController,
-            decoration: const InputDecoration(
-              labelText: 'Description',
-              border: OutlineInputBorder(),
-            ),
-          ),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              Expanded(
-                child: TextFormField(
-                  controller: controller.areaController,
-                  decoration: const InputDecoration(
-                    labelText: 'Area (m²)',
-                    border: OutlineInputBorder(),
-                  ),
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: TextFormField(
-                  controller: controller.unitRateController,
-                  decoration: const InputDecoration(
-                    labelText: 'Unit Rate',
-                    border: OutlineInputBorder(),
-                  ),
-                  keyboardType: TextInputType.number,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
 
   Widget _buildRevaluationFactors() {
     return Card(

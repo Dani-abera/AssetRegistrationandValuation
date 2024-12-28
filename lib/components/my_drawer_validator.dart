@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:land_house_verify/pages/authPage/registration_page.dart';
@@ -48,7 +50,7 @@ class MyDrawerValidator extends StatelessWidget {
             },
           ),
           MyDrawerTile(
-            text: 'E V A L U A T I O N',
+            text: 'V A L U A T I O N',
             icon: Icons.input_rounded,
             onTap: () {
               Navigator.push(
