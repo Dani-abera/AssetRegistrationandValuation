@@ -1,16 +1,26 @@
-import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:land_house_verify/pages/admin/asset_detail_page.dart';
+import 'package:flutter/material.dart';
+import 'package:land_house_verify/pages/validator/validator_asset_detail.dart';
 
+class SearchAsset extends StatefulWidget {
+  final String searchQuery;
 
-class AllAssetsPage extends StatelessWidget {
+  const SearchAsset({super.key, required this.searchQuery});
 
-  const AllAssetsPage({super.key, });
+  @override
+  State<SearchAsset> createState() => _SearchAssetState();
+}
 
+class _SearchAssetState extends State<SearchAsset> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-      stream: FirebaseFirestore.instance.collection('assets').snapshots(),
+      stream: FirebaseFirestore.instance
+          .collection('assets')
+          // Search query: Match assetName starting with searchQuery
+          .where('assetName', isGreaterThanOrEqualTo: widget.searchQuery)
+          .where('assetName', isLessThanOrEqualTo: widget.searchQuery + '\uf8ff')
+          .snapshots(),
       builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
@@ -20,6 +30,8 @@ class AllAssetsPage extends StatelessWidget {
         }
 
         final assets = snapshot.data?.docs ?? [];
+        print(assets);
+        print(widget.searchQuery);
 
         if (assets.isEmpty) {
           return const Center(child: Text('No assets found'));

@@ -17,10 +17,7 @@ class AdminPage extends StatefulWidget {
 class _AdminPageState extends State<AdminPage> {
   // Variable to keep track of the selected index
   int _selectedIndex = 0;
-  bool _isNotSearching = true;
 
-  // Variable to store the search query
-  String _searchQuery = "";
 
   // List of pages to display
   final List<Widget> _pages = [
@@ -36,61 +33,9 @@ class _AdminPageState extends State<AdminPage> {
     });
   }
 
-  // Function to handle search query change
-  void _onSearchQueryChanged(String query) {
-    setState(() {
-      _searchQuery = query;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: MyDrawer(),
-      appBar: AppBar(
-        title: _isNotSearching
-            ? Text(
-                'Welcome, ${widget.name.toUpperCase()}',
-                style: const TextStyle(color: Colors.black),
-              )
-            : Container(
-                margin: const EdgeInsets.only(top: 10),
-                height: 40,
-                width: 250,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(15),
-                    color: Colors.white),
-                child: TextFormField(
-                  onChanged: _onSearchQueryChanged, // Handle query change
-                  decoration: InputDecoration(
-                    hintText: 'Search registered assets',
-                    hintStyle: TextStyle(color: Theme.of(context).disabledColor),
-                    border: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 15),
-                  ),
-                ),
-              ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 10),
-            child: Row(
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _isNotSearching = false;
-                    });
-                  },
-                  child: const Icon(Icons.search),
-                ),
-                GestureDetector(
-                  child: const Icon(Icons.more_vert),
-                )
-              ],
-            ),
-          )
-        ],
-      ),
       body:_pages[_selectedIndex], // Display the selected page
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex, // Keep track of the selected index
@@ -111,5 +56,6 @@ class _AdminPageState extends State<AdminPage> {
         ],
       ),
     );
+  
   }
 }

@@ -26,6 +26,7 @@ class _RegisterAssetPageState extends State<RegisterAssetPage> {
   bool _isLoading = false;
 
   // Form controllers
+    final _assetIdController = TextEditingController();
   final _assetNameController = TextEditingController();
   final _ownershipController = TextEditingController();
   final _areaController = TextEditingController();
@@ -80,6 +81,7 @@ class _RegisterAssetPageState extends State<RegisterAssetPage> {
 
     try {
       final result = await assetRegister.registerAsset(
+        
         assetName: _assetNameController.text,
         ownership: _ownershipController.text,
         area: _areaController.text,
@@ -156,6 +158,10 @@ class _RegisterAssetPageState extends State<RegisterAssetPage> {
                 children: [
                   _buildThumbnailsSection(),
               const SizedBox(height: 16.0),
+                MyTextformfield(
+                    label: 'Name of Id',
+                    controller: _assetIdController,
+                  ),
                   MyTextformfield(
                     label: 'Name of Asset',
                     controller: _assetNameController,
@@ -213,7 +219,7 @@ class _RegisterAssetPageState extends State<RegisterAssetPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Asset Thumbnails', style: TextStyle(fontSize: 16.0)),
+        const Text('Asset Current Photo', style: TextStyle(fontSize: 16.0)),
         const SizedBox(height: 8.0),
         Stack(
           children: [
