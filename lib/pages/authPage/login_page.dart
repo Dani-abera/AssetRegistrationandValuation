@@ -22,6 +22,7 @@ class _LoginPageState extends State<LoginPage> {
   final _emailController = TextEditingController(); // Controller for email input
   final _passwordController = TextEditingController(); // Controller for password input
   bool _isLoading = false; // To show spinner during login
+  bool obscureText = true;
 
   // Function to fetch the id of the user (both Admin and Validator)
   Future<String> _fetchUserId() async {
@@ -120,11 +121,12 @@ class _LoginPageState extends State<LoginPage> {
             MyTextField(
               controller: _passwordController,
               hintText: "Password",
-              obscureText: true,
+              obscureText: obscureText,
               suffixIcon: IconButton(
                     onPressed: () {
                       setState(() {
                         isPasswordHidden = !isPasswordHidden;
+                        obscureText =false;
                       });
                     },
                     icon: Icon(
