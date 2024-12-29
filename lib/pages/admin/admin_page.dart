@@ -12,15 +12,14 @@ class AdminPage extends StatefulWidget {
 }
 
 class _AdminPageState extends State<AdminPage> {
-  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: MyDrawer(),
       appBar: AppBar(
-        title: Text('Welcome, ${widget.name.toUpperCase()}',style: TextStyle(color: Colors.black),),
-        backgroundColor: Colors.transparent,
-        
+        title: Text(
+          'Welcome, ${widget.name.toUpperCase()}',
+        ),
       ),
       body: StreamBuilder(
         stream: FirebaseFirestore.instance.collection('assets').snapshots(),
@@ -52,15 +51,15 @@ class _AdminPageState extends State<AdminPage> {
               return Padding(
                 padding: const EdgeInsets.all(20),
                 child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        height: 150,
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: ClipRRect(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      height: 150,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: ClipRRect(
                           borderRadius: const BorderRadius.only(
                             topLeft: Radius.circular(15),
                             topRight: Radius.circular(15),
@@ -83,73 +82,83 @@ class _AdminPageState extends State<AdminPage> {
                                       child: Text('Image not available'),
                                     );
                                   },
-                                )
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-                      Text('Asset Name: $assetName'),
-                      const SizedBox(height: 5),
-                      Text('Asset Owner: $ownership'),
-                      const SizedBox(height: 5),
-                      Row(
-                        children: [
-                          const Text('Valuator:'),
-                          const SizedBox(width: 10),
-                          Container(
-                            height: 20,
-                            width: 100,
-                            padding: const EdgeInsets.only(left: 5),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(5),
-                              color: const Color.fromARGB(255, 207, 209, 214),
-                            ),
-                            child: Text(validator),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 15),
-                     Row(children: [
-                        Text("Status: "),
-                        SizedBox(width: 10,),
+                                )),
+                    ),
+                    const SizedBox(height: 5),
+                    Text('Asset Name: $assetName'),
+                    const SizedBox(height: 5),
+                    Text('Asset Owner: $ownership'),
+                    const SizedBox(height: 5),
+                    Row(
+                      children: [
+                        const Text('Valuator:'),
+                        const SizedBox(width: 10),
                         Container(
-                          height: 20, 
+                          height: 20,
+                          width: 100,
+                          padding: const EdgeInsets.only(left: 5),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(5),
+                            color: const Color.fromARGB(255, 207, 209, 214),
+                          ),
+                          child: Text(validator),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 15),
+                    Row(
+                      children: [
+                        Text("Status: "),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        Container(
+                          height: 20,
                           width: 100,
                           padding: EdgeInsets.only(left: 5),
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(5),
-                            color: const Color.fromARGB(255, 207, 209, 214)
-                          ),
-                          child: Text(' ${data['status']}'),)
-                          
-                      ],),
-                      const SizedBox(height: 15,),
-                      Container(
-                        height: 40, 
+                              borderRadius: BorderRadius.circular(5),
+                              color: const Color.fromARGB(255, 207, 209, 214)),
+                          child: Text(' ${data['status']}'),
+                        )
+                      ],
+                    ),
+                    const SizedBox(
+                      height: 15,
+                    ),
+                    Container(
+                        height: 40,
                         width: double.infinity,
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5), 
-                          gradient: const LinearGradient(colors: [
-                            Colors.lightGreen,
-                            Colors.greenAccent
-                          ])
-                        ),
-                        child: ElevatedButton(onPressed: (){
-                          // Navigate to detailed asset page
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => AssetDetailPage(assetId: docId),
-                            ),
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          shadowColor: Colors.transparent,
-                          backgroundColor: Colors.transparent
-                        ), child: Text("View Detail", style: TextStyle(color: Colors.white,fontSize: 17, fontWeight: FontWeight.bold),),
-                        )
-                      ),
-                    ],
-                  ),
+                            borderRadius: BorderRadius.circular(5),
+                            gradient: const LinearGradient(colors: [
+                              Colors.lightGreen,
+                              Colors.greenAccent
+                            ])),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            // Navigate to detailed asset page
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    AssetDetailPage(assetId: docId),
+                              ),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                              shadowColor: Colors.transparent,
+                              backgroundColor: Colors.transparent),
+                          child: Text(
+                            "View Detail",
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 17,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        )),
+                  ],
+                ),
               );
             },
           );

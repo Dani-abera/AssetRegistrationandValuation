@@ -11,12 +11,17 @@ class ValidatedDataModel {
   final List<BuildingRelatedCost> buildingRelatedCosts;
   final double totalCostBuildingConstruction;
   final double totalBuildingRelatedCost;
-  final double totalCostBuilding;
   final String valuationStatus;
   final DateTime valuationDate;
   final double memlcFactor;
   final double currencyFactor;
   final double totalCostAfterRevaluation;
+  final Map<String, dynamic>? assetInfo;
+  final String selectedValuMethod;
+  final Map<String, double>? exchangeRates;
+  final double? landArea;
+  final double? landUnitRate;
+  final double? totalCostBuilding;
 
   ValidatedDataModel({
     required this.id,
@@ -35,6 +40,11 @@ class ValidatedDataModel {
     required this.memlcFactor,
     required this.currencyFactor,
     required this.totalCostAfterRevaluation,
+    this.assetInfo,
+    this.landArea = 0.0,
+    this.landUnitRate = 0.0,
+    this.selectedValuMethod = '',
+    this.exchangeRates,
   });
 
   Map<String, dynamic> toMap() {
@@ -56,11 +66,29 @@ class ValidatedDataModel {
       'memlcFactor': memlcFactor,
       'currencyFactor': currencyFactor,
       'totalCostAfterRevaluation': totalCostAfterRevaluation,
+      'assetInfo': assetInfo,
+      'landArea': landArea,
+      'landUnitRate': landUnitRate,
+      'selectedValuMethod': selectedValuMethod,
+      'exchangeRates': exchangeRates,
     };
   }
 
   factory ValidatedDataModel.fromMap(
       Map<String, dynamic> map, String documentId) {
+    Map<String, double>? convertedRates;
+    if (map['exchangeRates'] != null) {
+      convertedRates = {};
+      (map['exchangeRates'] as Map<String, dynamic>).forEach((key, value) {
+        if (value is int) {
+          convertedRates![key] = value.toDouble();
+        } else if (value is double) {
+          convertedRates![key] = value;
+        } else {
+          convertedRates![key] = double.tryParse(value.toString()) ?? 0.0;
+        }
+      });
+    }
     return ValidatedDataModel(
       id: documentId,
       name: map['name'] ?? '',
@@ -80,11 +108,18 @@ class ValidatedDataModel {
           map['totalBuildingRelatedCost']?.toDouble() ?? 0.0,
       totalCostBuilding: map['totalCostBuilding']?.toDouble() ?? 0.0,
       valuationStatus: map['valuationStatus'] ?? '',
-      valuationDate: (map['valuationDate'] as Timestamp).toDate(),
+      valuationDate: map['valuationDate'] != null
+          ? (map['valuationDate'] as Timestamp).toDate()
+          : DateTime.now(),
       memlcFactor: map['memlcFactor']?.toDouble() ?? 1.0,
       currencyFactor: map['currencyFactor']?.toDouble() ?? 1.0,
       totalCostAfterRevaluation:
           map['totalCostAfterRevaluation']?.toDouble() ?? 0.0,
+      assetInfo: map['assetInfo'] as Map<String, dynamic>?,
+      landArea: map['landArea']?.toDouble() ?? 0.0,
+      landUnitRate: map['landUnitRate']?.toDouble() ?? 0.0,
+      selectedValuMethod: map['selectedValuMethod'] ?? '',
+      exchangeRates: convertedRates,
     );
   }
 }

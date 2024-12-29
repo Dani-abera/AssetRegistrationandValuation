@@ -1,7 +1,8 @@
-// ignore_for_file: file_names, use_build_context_synchronously
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:open_file/open_file.dart';
+import '../../API/fetch_exchange_rate.dart';
 import '../../model/validated_data_model.dart';
 import '../../service_locator.dart';
 import '../../services/report_service.dart';
@@ -12,6 +13,7 @@ import 'construction_cost_controller.dart';
 class ValidationInputScreen extends StatefulWidget {
   final String? assetId; // Optional - for editing existing validation
   final Map<String, dynamic>? assetInfo;
+
   const ValidationInputScreen({super.key, this.assetId, this.assetInfo});
 
   @override
@@ -22,6 +24,21 @@ class _ValidationInputScreenState extends State<ValidationInputScreen> {
   final _formKey = GlobalKey<FormState>();
   final _validationService = getIt<ValidationService>();
   bool _isLoading = false;
+  Map<String, double>? _exchangeRates;
+  final List<String> _currencyList = ['USD', 'AUD', 'CAD', 'AED'];
+
+  // Add these to your state class
+  final _landAreaController = TextEditingController();
+  final _landUnitRateController = TextEditingController();
+  String _selectedValuMethod = 'Lease Office Value'; // Default value
+  double? _previousValidationAmount;
+
+// Add land grade options
+  final List<String> _valueMethode = [
+    'Lease Office Value',
+    'Local Broker',
+    'Price Of a Similar Land In The Area',
+  ];
 
   // Controllers for basic information
   final _nameController = TextEditingController();
@@ -44,20 +61,61 @@ class _ValidationInputScreenState extends State<ValidationInputScreen> {
   @override
   void initState() {
     super.initState();
-    _nameController.text = widget.assetInfo!['assetName'] ?? '';
-    _valuatorNameController.text = widget.assetInfo!['validator'] ?? '';
-    _selectedAssetType = widget.assetInfo!['assetType'] ?? '';
-    
+    _initializeData();
     _addInitialCosts();
     _loadExistingData();
+    _fetchExchangeRates();
+  }
+
+  Future<void> _fetchExchangeRates() async {
+    final rates = await FetchExchangeRate.getExchangeRates();
+    if (rates != null) {
+      print('Fetched exchange rates: $rates'); // Debug print
+      setState(() {
+        _exchangeRates = rates;
+      });
+    }
+  }
+
+  void _initializeData() {
+    if (widget.assetInfo != null) {
+      // Set values from assetInfo if available
+      _nameController.text = widget.assetInfo!['assetName'] ?? '';
+      // _valuatorNameController.text =
+      //     widget.assetInfo!['assignedValidator'] ?? '';
+      _selectedAssetType = widget.assetInfo!['assetType'] ?? 'Land';
+
+      // Additional asset info that might be useful
+      _valuationExecutorController.text = widget.assetInfo!['ownership'] ?? '';
+
+      // You might want to add these to the form display
+      final location = widget.assetInfo!['location'] ?? '';
+      final titleDeedNumber = widget.assetInfo!['titleDeedNumber'] ?? '';
+      final createdAt = widget.assetInfo!['createdAt'];
+      final DateTime createdDateTime =
+          createdAt is Timestamp ? createdAt.toDate() : DateTime.now();
+    } else {
+      // Set default values when no asset info is provided
+      _nameController.text = '';
+      _valuatorNameController.text = '';
+      _valuationExecutorController.text = '';
+      _selectedAssetType = 'Land';
+    }
   }
 
   void _addInitialCosts() {
     // Add initial empty construction cost
     var constructionCostController = ConstructionCostController();
-    constructionCostController.descriptionController.text = widget.assetInfo!['description'] ?? '';
+
+    // Only set description if assetInfo exists
+    if (widget.assetInfo != null) {
+      // constructionCostController.descriptionController.text =
+      //     widget.assetInfo!['description'] ?? '';
+      constructionCostController.areaController.text =
+          widget.assetInfo!['area'] ?? '';
+    }
     _constructionCosts.add(constructionCostController);
-    
+
     // Add initial empty building related cost
     _buildingRelatedCosts.add(BuildingRelatedCostController());
   }
@@ -74,6 +132,23 @@ class _ValidationInputScreenState extends State<ValidationInputScreen> {
       } finally {
         setState(() => _isLoading = false);
       }
+    }
+  }
+
+  Future<bool> _checkPreviousValidation() async {
+    try {
+      final previousValidation =
+          await _validationService.getLatestValidation(widget.assetId!);
+      if (previousValidation != null) {
+        setState(() {
+          _previousValidationAmount = previousValidation.totalCostBuilding;
+        });
+        return true;
+      }
+      return false;
+    } catch (e) {
+      print('Error checking previous validation: $e');
+      return false;
     }
   }
 
@@ -111,14 +186,19 @@ class _ValidationInputScreenState extends State<ValidationInputScreen> {
     setState(() => _isLoading = true);
 
     try {
-      // Create validation object using your existing form data
+      // Calculate total cost
+      double totalCost = _selectedAssetType == 'Land'
+          ? (double.tryParse(_landAreaController.text) ?? 0) *
+              (double.tryParse(_landUnitRateController.text) ?? 0)
+          : _calculateTotalCost();
+
       final validation = ValidatedDataModel(
         id: widget.assetId ?? DateTime.now().millisecondsSinceEpoch.toString(),
         name: _nameController.text,
         valuatorName: _valuatorNameController.text,
         valuationExecutor: _valuationExecutorController.text,
         assetType: _selectedAssetType,
-        valuationMethod: _selectedValuationMethod,
+        valuationMethod: _selectedValuMethod,
         constructionCosts:
             _constructionCosts.map((c) => c.toConstructionCost()).toList(),
         buildingRelatedCosts: _buildingRelatedCosts
@@ -126,16 +206,19 @@ class _ValidationInputScreenState extends State<ValidationInputScreen> {
             .toList(),
         totalCostBuildingConstruction: _calculateTotalConstructionCost(),
         totalBuildingRelatedCost: _calculateTotalRelatedCost(),
-        totalCostBuilding:
-            _calculateTotalConstructionCost() + _calculateTotalRelatedCost(),
+        totalCostBuilding: totalCost,
         valuationStatus: _valuationStatus,
         valuationDate: DateTime.now(),
-        memlcFactor: double.parse(_memlcFactorController.text),
-        currencyFactor: double.parse(_currencyFactorController.text),
+        memlcFactor: double.tryParse(_memlcFactorController.text) ?? 1.0,
+        currencyFactor: double.tryParse(_currencyFactorController.text) ?? 1.0,
         totalCostAfterRevaluation: _calculateTotalCostAfterRevaluation(),
+        assetInfo: widget.assetInfo,
+        landArea: double.tryParse(_landAreaController.text),
+        landUnitRate: double.tryParse(_landUnitRateController.text),
+        selectedValuMethod: _selectedValuMethod,
+        exchangeRates: _exchangeRates,
       );
 
-      // Generate and save the report
       final reportService = getIt<ReportService>();
       final file = await reportService.generateValidationReport(validation);
 
@@ -178,7 +261,7 @@ class _ValidationInputScreenState extends State<ValidationInputScreen> {
         title:
             Text(widget.assetId != null ? 'Edit Validation' : 'New Validation'),
         actions: [
-          if (widget.assetId != null) // Only show for existing validations
+          if (widget.assetId != null)
             IconButton(
               icon: const Icon(Icons.picture_as_pdf),
               onPressed: _generateReport,
@@ -200,9 +283,17 @@ class _ValidationInputScreenState extends State<ValidationInputScreen> {
                   children: [
                     _buildBasicInformation(),
                     const SizedBox(height: 24),
-                    _buildConstructionCostsSection(),
-                    const SizedBox(height: 24),
-                    _buildBuildingRelatedCostsSection(),
+                    // Show different forms based on asset type
+                    if (_selectedAssetType == 'Land')
+                      _buildLandValuationForm()
+                    else
+                      Column(
+                        children: [
+                          _buildConstructionCostsSection(),
+                          const SizedBox(height: 24),
+                          _buildBuildingRelatedCostsSection(),
+                        ],
+                      ),
                     const SizedBox(height: 24),
                     if (_valuationStatus == 'Revaluation')
                       _buildRevaluationFactors(),
@@ -358,6 +449,70 @@ class _ValidationInputScreenState extends State<ValidationInputScreen> {
     );
   }
 
+  Widget _buildLandValuationForm() {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Land Valuation',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: _landAreaController,
+              decoration: const InputDecoration(
+                labelText: 'Land Area (m²)',
+                border: OutlineInputBorder(),
+              ),
+              keyboardType: TextInputType.number,
+              validator: (value) {
+                if (value?.isEmpty ?? true) return 'Please enter land area';
+                if (double.tryParse(value!) == null)
+                  return 'Please enter valid number';
+                return null;
+              },
+            ),
+            const SizedBox(height: 16),
+            DropdownButtonFormField<String>(
+              value: _selectedValuMethod,
+              decoration: const InputDecoration(
+                labelText: 'Land Grade',
+                border: OutlineInputBorder(),
+              ),
+              items: _valueMethode
+                  .map((grade) => DropdownMenuItem(
+                        value: grade,
+                        child: Text(grade),
+                      ))
+                  .toList(),
+              onChanged: (value) {
+                if (value != null) setState(() => _selectedValuMethod = value);
+              },
+            ),
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: _landUnitRateController,
+              decoration: const InputDecoration(
+                labelText: 'Unit Rate (per m²)',
+                border: OutlineInputBorder(),
+              ),
+              keyboardType: TextInputType.number,
+              validator: (value) {
+                if (value?.isEmpty ?? true) return 'Please enter unit rate';
+                if (double.tryParse(value!) == null)
+                  return 'Please enter valid number';
+                return null;
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildBuildingRelatedCostsSection() {
     return Card(
       child: Padding(
@@ -464,8 +619,23 @@ class _ValidationInputScreenState extends State<ValidationInputScreen> {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
+            // Display asset info if available
+            if (widget.assetInfo != null) ...[
+              _buildInfoRow('Location', widget.assetInfo!['location'] ?? ''),
+              _buildInfoRow(
+                  'Title Deed', widget.assetInfo!['titleDeedNumber'] ?? ''),
+              _buildInfoRow('Owner', widget.assetInfo!['ownership'] ?? ''),
+              if (widget.assetInfo!['createdAt'] != null)
+                _buildInfoRow(
+                  'Created At',
+                  DateFormat('dd MMM yyyy').format(
+                    (widget.assetInfo!['createdAt'] as Timestamp).toDate(),
+                  ),
+                ),
+              const Divider(),
+            ],
+            // Rest of your existing form fields
             TextFormField(
-              
               controller: _nameController,
               decoration: const InputDecoration(
                 labelText: 'Asset Name',
@@ -528,6 +698,26 @@ class _ValidationInputScreenState extends State<ValidationInputScreen> {
     );
   }
 
+  Widget _buildInfoRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 100,
+            child: Text(
+              '$label:',
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ),
+          Expanded(
+            child: Text(value),
+          ),
+        ],
+      ),
+    );
+  }
 
   Widget _buildRevaluationFactors() {
     return Card(
@@ -572,10 +762,23 @@ class _ValidationInputScreenState extends State<ValidationInputScreen> {
     );
   }
 
+  double _calculateTotalCost() {
+    if (_selectedAssetType == 'Land') {
+      final area = double.tryParse(_landAreaController.text) ?? 0;
+      final unitRate = double.tryParse(_landUnitRateController.text) ?? 0;
+      return area * unitRate;
+    } else {
+      return _calculateTotalConstructionCost() + _calculateTotalRelatedCost();
+    }
+  }
+
   Widget _buildTotalCostDisplay() {
-    final totalConstructionCost = _calculateTotalConstructionCost();
-    final totalRelatedCost = _calculateTotalRelatedCost();
-    final totalCost = totalConstructionCost + totalRelatedCost;
+    final totalCost = _calculateTotalCost();
+    final totalAfterRevaluation = _valuationStatus == 'Revaluation'
+        ? totalCost *
+            double.parse(_memlcFactorController.text) *
+            double.parse(_currencyFactorController.text)
+        : totalCost;
 
     return Card(
       child: Padding(
@@ -588,15 +791,14 @@ class _ValidationInputScreenState extends State<ValidationInputScreen> {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
-            Text(
-                'Total Construction Cost: \$${totalConstructionCost.toStringAsFixed(2)}'),
-            Text(
-                'Total Related Cost: \$${totalRelatedCost.toStringAsFixed(2)}'),
-            const Divider(),
-            Text(
-              'Total Cost: \$${totalCost.toStringAsFixed(2)}',
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
+            if (_previousValidationAmount != null &&
+                _valuationStatus == 'Revaluation')
+              Text(
+                  'Previous Validation Amount: \$${_previousValidationAmount!.toStringAsFixed(2)}'),
+            Text('Total Cost: \$${totalCost.toStringAsFixed(2)}'),
+            if (_valuationStatus == 'Revaluation')
+              Text(
+                  'Total After Revaluation: \$${totalAfterRevaluation.toStringAsFixed(2)}'),
           ],
         ),
       ),
@@ -614,13 +816,43 @@ class _ValidationInputScreenState extends State<ValidationInputScreen> {
   }
 
   Future<void> _submitValidation() async {
-    if (!_formKey.currentState!.validate()) {
-      return;
+    if (!_formKey.currentState!.validate()) return;
+
+    if (_valuationStatus == 'Revaluation') {
+      final hasPreValidation = await _checkPreviousValidation();
+      if (!hasPreValidation) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content:
+                  Text('Asset must be validated first before revaluation')),
+        );
+        return;
+      }
     }
 
+    if (_exchangeRates == null) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to fetch exchange rates. Please try again.'),
+          ),
+        );
+      }
+      return;
+    }
     setState(() => _isLoading = true);
 
     try {
+      Map<String, double> convertedRates = {};
+      _exchangeRates!.forEach((key, value) {
+        if (value is int) {
+          convertedRates[key] = value.toDouble();
+        } else if (value is double) {
+          convertedRates[key] = value;
+        } else {
+          convertedRates[key] = double.tryParse(value.toString()) ?? 0.0;
+        }
+      });
       final validation = ValidatedDataModel(
         id: widget.assetId ?? DateTime.now().millisecondsSinceEpoch.toString(),
         name: _nameController.text,
@@ -642,6 +874,8 @@ class _ValidationInputScreenState extends State<ValidationInputScreen> {
         memlcFactor: double.parse(_memlcFactorController.text),
         currencyFactor: double.parse(_currencyFactorController.text),
         totalCostAfterRevaluation: _calculateTotalCostAfterRevaluation(),
+        exchangeRates: convertedRates,
+        assetInfo: widget.assetInfo,
       );
 
       final result = widget.assetId != null
@@ -654,6 +888,7 @@ class _ValidationInputScreenState extends State<ValidationInputScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Validation saved successfully')),
           );
+          //Navigator.pop(context); // Return to previous screen after saving
         } else {
           throw Exception('Failed to save validation');
         }

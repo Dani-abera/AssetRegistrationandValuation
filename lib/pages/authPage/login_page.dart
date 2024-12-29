@@ -19,8 +19,10 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final AuthService _authService = AuthService(); // Instance of AuthService
-  final _emailController = TextEditingController(); // Controller for email input
-  final _passwordController = TextEditingController(); // Controller for password input
+  final _emailController =
+      TextEditingController(); // Controller for email input
+  final _passwordController =
+      TextEditingController(); // Controller for password input
   bool _isLoading = false; // To show spinner during login
 
   // Function to fetch the id of the user (both Admin and Validator)
@@ -68,7 +70,9 @@ class _LoginPageState extends State<LoginPage> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (_) => AdminPage(name: adminId,), // Pass id to AdminPage
+          builder: (_) => AdminPage(
+            name: adminId,
+          ), // Pass id to AdminPage
         ),
       );
     } else if (result == 'validator') {
@@ -76,7 +80,8 @@ class _LoginPageState extends State<LoginPage> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (_) => ValidatorPage(name: validatorId), // Pass id to ValidatorPage
+          builder: (_) =>
+              ValidatorPage(name: validatorId), // Pass id to ValidatorPage
         ),
       );
     } else {
@@ -120,20 +125,17 @@ class _LoginPageState extends State<LoginPage> {
             MyTextField(
               controller: _passwordController,
               hintText: "Password",
-              obscureText: true,
+              obscureText: isPasswordHidden,
               suffixIcon: IconButton(
-                    onPressed: () {
-                      setState(() {
-                        isPasswordHidden = !isPasswordHidden;
-                      });
-                    },
-                    icon: Icon(
-                      isPasswordHidden
-                          ? Icons.visibility_off
-                          : Icons.visibility,
-                    ),
-                  ),
-           
+                onPressed: () {
+                  setState(() {
+                    isPasswordHidden = !isPasswordHidden;
+                  });
+                },
+                icon: Icon(
+                  isPasswordHidden ? Icons.visibility_off : Icons.visibility,
+                ),
+              ),
             ),
             SizedBox(height: 25),
             SizedBox(height: 25),

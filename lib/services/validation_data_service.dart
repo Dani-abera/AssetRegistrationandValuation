@@ -74,7 +74,7 @@ class ValidationService {
         memlcFactor: memlcFactor,
         currencyFactor: currencyFactor,
         totalCostAfterRevaluation:
-            original.totalCostBuilding * memlcFactor * currencyFactor,
+            original.totalCostBuilding! * memlcFactor * currencyFactor,
       );
 
       return await createValidation(revaluation);
@@ -102,6 +102,22 @@ class ValidationService {
       return true;
     } catch (e) {
       return false;
+    }
+  }
+
+  Future<List<ValidatedDataModel>> getAllValidationsForList() async {
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection('validations')
+          .orderBy('valuationDate', descending: true)
+          .get();
+
+      return snapshot.docs
+          .map((doc) => ValidatedDataModel.fromMap(doc.data(), doc.id))
+          .toList();
+    } catch (e) {
+      print('Error getting validations: $e');
+      return [];
     }
   }
 
