@@ -27,7 +27,7 @@ class AssetRegisterService {
       final asset = AssetModel(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         assetId:assetId,
-        assetName: assetName,
+        assetName: assetName.toLowerCase(),
         ownership: ownership,
         area: area,
         location: location,
