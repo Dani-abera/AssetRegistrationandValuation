@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:land_house_verify/components/my_drawer.dart';
 import 'package:land_house_verify/pages/admin/assets_page.dart';
 import 'package:land_house_verify/pages/admin/register_asset_page.dart';
-import 'package:land_house_verify/pages/admin/widgets/all_assets_page.dart';
-import 'package:land_house_verify/pages/admin/widgets/latest_assets_page.dart';
 import 'package:land_house_verify/pages/authPage/registration_page.dart';
 
 class AdminPage extends StatefulWidget {

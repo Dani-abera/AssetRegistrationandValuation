@@ -8,6 +8,7 @@ import 'dart:io';
 
 import 'package:get_it/get_it.dart';
 import 'package:land_house_verify/components/my_textFormField.dart';
+import 'package:land_house_verify/pages/admin/admin_page.dart';
 import 'package:land_house_verify/services/asset_register_service.dart';
 import 'package:land_house_verify/services/upload_image.dart';
 
@@ -81,7 +82,7 @@ class _RegisterAssetPageState extends State<RegisterAssetPage> {
 
     try {
       final result = await assetRegister.registerAsset(
-        
+        assetId: _assetIdController.text,
         assetName: _assetNameController.text,
         ownership: _ownershipController.text,
         area: _areaController.text,
@@ -99,7 +100,7 @@ class _RegisterAssetPageState extends State<RegisterAssetPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Asset registered successfully!')),
         );
-        Navigator.pop(context);
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => AdminPage(name: "name")));
       } else {
         throw Exception(result);
       }
@@ -159,7 +160,7 @@ class _RegisterAssetPageState extends State<RegisterAssetPage> {
                   _buildThumbnailsSection(),
               const SizedBox(height: 16.0),
                 MyTextformfield(
-                    label: 'Name of Id',
+                    label: 'Asset Id',
                     controller: _assetIdController,
                   ),
                   MyTextformfield(

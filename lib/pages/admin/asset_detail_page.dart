@@ -264,7 +264,7 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                Text('Asset ID: ${widget.assetId}'),
+                Text('Asset ID: ${data['assetId'] ?? 'N/A'}'),
                 Text('Ownership: ${data['ownership'] ?? 'N/A'}'),
                 Text('Area: ${data['area'] ?? 'N/A'} m²'),
                 Text('Location: ${data['location'] ?? 'N/A'}'),
