@@ -9,6 +9,7 @@ class AssetRegisterService {
 
   // Register new asset
   Future<String?> registerAsset({
+    required String assetId,
     required String assetName,
     required String ownership,
     required String area,
@@ -25,6 +26,7 @@ class AssetRegisterService {
       // 2. Create asset model
       final asset = AssetModel(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
+        assetId:assetId,
         assetName: assetName,
         ownership: ownership,
         area: area,

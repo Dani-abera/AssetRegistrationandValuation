@@ -5,9 +5,9 @@ class AssetDetailPage extends StatelessWidget {
   final String assetId;
   
   const AssetDetailPage({
-    Key? key, 
+    super.key, 
     required this.assetId
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'fetch_exchange_rate.dart';
 
 class CurrencyConverterToETB extends StatefulWidget {

@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AssetModel {
   final String id;
+  final String assetId;
   final String assetName;
   final String ownership;
   final String area;
@@ -17,6 +18,7 @@ class AssetModel {
 
   AssetModel({
     required this.id,
+    required this.assetId,
     required this.assetName,
     required this.ownership,
     required this.area,
@@ -34,6 +36,7 @@ class AssetModel {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
+      'assetId':assetId,
       'assetName': assetName,
       'ownership': ownership,
       'area': area,
@@ -52,6 +55,7 @@ class AssetModel {
   factory AssetModel.fromMap(Map<String, dynamic> map, String documentId) {
     return AssetModel(
       id: documentId,
+      assetId: map['assetName'],
       assetName: map['assetName'] ?? '',
       ownership: map['ownership'] ?? '',
       area: map['area'] ?? '',
