@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:photo_view/photo_view.dart';
+import 'package:photo_view/photo_view.dart'; 
 
 class AssetOwnerDetailPage extends StatefulWidget {
   final String assetId;
@@ -180,7 +180,7 @@ class _AssetDetailPageState extends State<AssetOwnerDetailPage> {
                 const SizedBox(height: 20),
                 const Divider(),
                 const SizedBox(height: 20),
-                Center(child: ElevatedButton(onPressed: data['status']=='valuated' ?_toggleEnabled:null, child: Text("Request valuation report")),)
+                Center(child: ElevatedButton(onPressed: data['status']=='Valuated' ?_toggleEnabled:null, child: Text("Request valuation report")),)
               ],
             ),
           );

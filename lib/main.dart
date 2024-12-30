@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:land_house_verify/pages/asset-owner/asset_owner_page.dart';
 import 'package:land_house_verify/service_locator.dart';
 import 'package:land_house_verify/services/login_or_register.dart';
 import 'package:land_house_verify/themes/themes_provider.dart';

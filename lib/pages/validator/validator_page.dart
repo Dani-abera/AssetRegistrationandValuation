@@ -1,7 +1,5 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:land_house_verify/components/my_drawer_validator.dart';
-import 'package:land_house_verify/pages/validator/validator_asset_detail.dart';
 import 'package:land_house_verify/pages/widget/asset_card_view.dart';
 
 class ValidatorPage extends StatefulWidget {
