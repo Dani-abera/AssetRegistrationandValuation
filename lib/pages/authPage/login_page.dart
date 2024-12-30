@@ -3,6 +3,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:land_house_verify/pages/asset-owner/asset_owner_page.dart';
 import 'package:land_house_verify/pages/validator/validator_page.dart';
 import '../../components/my_button.dart';
 import '../../components/my_textfield.dart';
@@ -80,7 +81,17 @@ class _LoginPageState extends State<LoginPage> {
           builder: (_) => ValidatorPage(name: validatorId), // Pass id to ValidatorPage
         ),
       );
-    } else {
+    } else if (result == 'Assetowner') {
+      String assetOwnerId = await _fetchUserId(); // Fetch assetOwner's id
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => AssetOwnerPage(isEqualTo: assetOwnerId, condition: 'ownership',), // Pass id to ValidatorPage
+        ),
+      );
+    }
+    
+    else {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('Login Failed: $result'), // Show error message
       ));

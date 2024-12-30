@@ -17,7 +17,7 @@ class _SearchAssetState extends State<SearchAsset> {
       stream: FirebaseFirestore.instance.collection('assets')
       // Use the original search query without converting to lowercase
           .where('assetName', isGreaterThanOrEqualTo: widget.searchQuery.trim())
-          .where('assetName', isLessThanOrEqualTo: widget.searchQuery.trim() + '\uf8ff')
+          .where('assetName', isLessThanOrEqualTo: '${widget.searchQuery.trim()}\uf8ff')
           // Ensure we don't match empty asset names
           //.where('assetName', isNotEqualTo: '') 
           .snapshots(),
@@ -60,7 +60,7 @@ class _SearchAssetState extends State<SearchAsset> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => AssetDetailPage(assetId: docId),
+                            builder: (context) => AssetValuatorDetailPage(assetId: docId),
                           ),
                         );
                       },
@@ -95,7 +95,7 @@ class _SearchAssetState extends State<SearchAsset> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => AssetDetailPage(assetId: docId),
+                              builder: (context) => AssetValuatorDetailPage(assetId: docId),
                             ),
                           );
                         },
