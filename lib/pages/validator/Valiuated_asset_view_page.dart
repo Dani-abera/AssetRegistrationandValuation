@@ -16,7 +16,11 @@ class _ValidationScreenState extends State<ValidationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<List<ValidatedDataModel>>(
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Revaluation Page"),
+      ),
+      body: StreamBuilder<List<ValidatedDataModel>>(
       stream: _validationService.getValidations(),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
@@ -28,18 +32,22 @@ class _ValidationScreenState extends State<ValidationScreen> {
         }
 
         final validations = snapshot.data!;
-        return ListView.builder(
-          itemCount: validations.length,
-          itemBuilder: (context, index) {
-            final validation = validations[index];
-            return ListTile(
-                title: Text(validation.name),
-                subtitle: Text('Total Cost: ${validation.totalCostBuilding}'),
-                trailing: Text(validation.valuationStatus),
-                onTap: () {});
-          },
+        return Expanded(
+          child: ListView.builder(
+            itemCount: validations.length,
+            itemBuilder: (context, index) {
+              final validation = validations[index];
+              return ListTile(
+                  title: Text(validation.name),
+                  subtitle: Text('Total Cost: ${validation.totalCostBuilding}'),
+                  trailing: Text(validation.valuationStatus),
+                  onTap: () {});
+            },
+          ),
         );
       },
-    );
-  }
+  ));}
 }
+    
+    
+    
