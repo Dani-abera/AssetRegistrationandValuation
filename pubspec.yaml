@@ -48,6 +48,7 @@ dependencies:
   image_picker: ^1.1.2
   photo_view: ^0.15.0
   path: ^1.9.0
+  toastification: ^2.3.0
 
 dev_dependencies:
   flutter_test:

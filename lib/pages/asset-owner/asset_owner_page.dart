@@ -1,5 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:land_house_verify/pages/asset-owner/valuation_report.dart';
+import 'package:land_house_verify/pages/validator/notification_page.dart';
 import 'package:land_house_verify/pages/widget/asset_card_view.dart';
 import 'package:land_house_verify/services/login_or_register.dart';
 
@@ -22,7 +24,6 @@ class _AssetOwnerPageState extends State<AssetOwnerPage> {
           child:  CircleAvatar(backgroundColor: Theme.of(context).disabledColor,radius: 20.0, child: Icon(Icons.person_3_rounded)),
         ),
         title: Text("Owned Assets"),
-        centerTitle: true,
         actions: [Padding(
           padding: const EdgeInsets.all(8.0),
           child: GestureDetector(
@@ -42,7 +43,28 @@ class _AssetOwnerPageState extends State<AssetOwnerPage> {
                 ),
               )
             ),
-        )
+        ),
+        GestureDetector(
+            onTap: (){
+              Navigator.push(context, MaterialPageRoute(builder: (context) => ValuationReport()));
+            },
+            child: Stack(
+              children: [
+                Positioned(
+                  right: 8, 
+                  top: 0,
+                  child: Text("1",
+                  style: TextStyle(color: Colors.redAccent),
+                  )
+                  ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Icon(Icons.notifications),
+                ),
+              ],
+            ),
+          )
+       
       ],
 
         ),

@@ -18,10 +18,11 @@ class AssetsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final String assetowner = isEqualTo!;
     return StreamBuilder(
       stream: FirebaseFirestore.instance
           .collection('assets')
-          .where(condition!, isEqualTo: isEqualTo) // Filter by the current validator's name
+          .where(condition!, isEqualTo: assetowner) // Filter by the current validator's name
           .snapshots(),
       builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -141,11 +142,11 @@ class AssetsCard extends StatelessWidget {
                           MaterialPageRoute(
                             builder: (context) =>
                                role =='Assetowner'? 
-                               AssetOwnerDetailPage(assetId: docId):
+                               AssetOwnerDetailPage(assetId: docId, owner:assetowner):
                                AssetValuatorDetailPage(assetId: docId),
                           ),
                         );
-                        print(role);
+                        //print(assetowner);
                       },
                       style: ElevatedButton.styleFrom(
                           shadowColor: Colors.transparent,

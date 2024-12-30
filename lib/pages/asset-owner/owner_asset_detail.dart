@@ -2,12 +2,14 @@
 
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:photo_view/photo_view.dart'; 
+import 'package:land_house_verify/components/custom_toast_info.dart';
+import 'package:photo_view/photo_view.dart';
 
 class AssetOwnerDetailPage extends StatefulWidget {
   final String assetId;
+  final String? owner;
 
-  const AssetOwnerDetailPage({super.key, required this.assetId});
+  const AssetOwnerDetailPage({super.key, required this.assetId,this.owner});
 
   @override
   State<AssetOwnerDetailPage> createState() => _AssetDetailPageState();
@@ -16,16 +18,37 @@ class AssetOwnerDetailPage extends StatefulWidget {
 class _AssetDetailPageState extends State<AssetOwnerDetailPage> {
   String? selectedValidator;
   List<DocumentSnapshot> validators = [];
-  String? validatorName;
+  String? assetName;
   bool validatorAssigned=false;
    bool _isValuated = false;
 
   void _toggleEnabled() {
-    setState(() {
+    setState(()  async {
       _isValuated = !_isValuated;
+      final requestdata = {
+        'from': widget.owner,
+        'msg': 'can you send me valuation report document of: $assetName',
+        'assetName':assetName,
+        'to': selectedValidator,
+        'date': DateTime.now()
+      };
+      print(requestdata);
+      try {
+        await FirebaseFirestore.instance.collection('report_request').add(requestdata);
+        customToastInfo(
+          context: context, 
+          message: 'Your report valuation request for approval to $selectedValidator is successful!'
+        );
+
+        } catch (e) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error submitting registration: $e')),
+          );
+        }
+
+      print(requestdata);
     });
   }
-
 
   @override
   void initState() {
@@ -115,6 +138,9 @@ class _AssetDetailPageState extends State<AssetOwnerDetailPage> {
             return const Center(child: Text('Asset not found'));
           }
           final data = snapshot.data!.data() as Map<String, dynamic>;
+          selectedValidator = data['validator'];
+          assetName = data['assetName'];
+          
 
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16.0),
@@ -169,6 +195,7 @@ class _AssetDetailPageState extends State<AssetOwnerDetailPage> {
                   ),
                 ),
                 const SizedBox(height: 20),
+                
                 Text('Asset ID: ${data['assetId'] ?? 'N/A'}'),
                 Text('Ownership: ${data['ownership'] ?? 'N/A'}'),
                 Text('Area: ${data['area'] ?? 'N/A'} m²'),
