@@ -49,6 +49,8 @@ dependencies:
   photo_view: ^0.15.0
   path: ^1.9.0
   toastification: ^2.3.0
+  url_launcher: ^6.3.1
+  flutter_pdfview: ^1.4.0
 
 dev_dependencies:
   flutter_test:

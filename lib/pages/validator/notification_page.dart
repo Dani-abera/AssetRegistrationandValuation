@@ -36,6 +36,7 @@ class NotificationPage extends StatelessWidget {
             final from = data['from'] ?? 'Unknown owner';
             final assetName = data['assetName'] ?? 'Unknown Asset Name';
             final message = data['msg'] ?? 'Not msg';
+            final notificationId = assets[index].id;
 
             print(data);
     
@@ -56,6 +57,7 @@ class NotificationPage extends StatelessWidget {
                     from: from,
                     assetName: assetName,
                     message:message,
+                    notificationId:notificationId
                   ),
                   ],
                 ),

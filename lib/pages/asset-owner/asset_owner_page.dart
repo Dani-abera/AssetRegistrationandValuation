@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:land_house_verify/pages/asset-owner/valuation_report.dart';
-import 'package:land_house_verify/pages/validator/notification_page.dart';
+import 'package:land_house_verify/pages/asset-owner/owner_notification_page.dart';
 import 'package:land_house_verify/pages/widget/asset_card_view.dart';
 import 'package:land_house_verify/services/login_or_register.dart';
 
@@ -46,7 +45,7 @@ class _AssetOwnerPageState extends State<AssetOwnerPage> {
         ),
         GestureDetector(
             onTap: (){
-              Navigator.push(context, MaterialPageRoute(builder: (context) => ValuationReport()));
+              Navigator.push(context, MaterialPageRoute(builder: (context) => OwnerNotificationPage(owner:widget.isEqualTo)));
             },
             child: Stack(
               children: [

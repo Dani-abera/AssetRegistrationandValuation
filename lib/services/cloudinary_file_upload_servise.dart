@@ -1,10 +1,11 @@
 import 'dart:convert';
 import 'dart:io';
-
 // ignore: depend_on_referenced_packages
 import 'package:http/http.dart' as http;
+import 'package:land_house_verify/components/custom_toast_info.dart';
 
-final cloudinaryUrl = 'https://api.cloudinary.com/v1_1/dyzeb4vxu/image/upload';
+class  CloudinaryFileUploadService {
+  final cloudinaryUrl = 'https://api.cloudinary.com/v1_1/dyzeb4vxu/image/upload';
 final preset = 'Asset-Registry';
 
 Future<List<String>> uploadMultipleImagesToCloudinary(List<File> images) async {
@@ -38,7 +39,7 @@ Future<List<String>> uploadMultipleImagesToCloudinary(List<File> images) async {
 }
 
 Future<String?> uploadDocumentToCloudinary(String filePath) async {
-  final cloudinaryUrl = 'https://api.cloudinary.com/v1_1/dyzeb4vxu/auto/upload';
+  final cloudinaryUrl = 'https://api.cloudinary.com/v1_1/dyzeb4vxu/auto/upload'; // Replace with your Cloudinary upload preset
 
   try {
     final file = File(filePath);
@@ -53,19 +54,28 @@ Future<String?> uploadDocumentToCloudinary(String filePath) async {
     final response = await request.send();
 
     if (response.statusCode == 200) {
+      // Parse the response data as JSON
       final responseData = await http.Response.fromStream(response);
-      final data = responseData.body;
-      print('Document uploaded successfully: $data');
+      final jsonResponse = jsonDecode(responseData.body);
 
-      // Parse and return the URL from Cloudinary's response
-      final url = data.contains('url') ? data.split('"url":"')[1].split('"')[0] : null;
-      return url;
+      if (jsonResponse['url'] != null) {
+        final uploadedUrl = jsonResponse['url'];
+        customToastInfo(message: 'Document uploaded successfully!');
+        return uploadedUrl;
+      } else {
+        customToastInfo(message: 'Upload successful, but no URL found in response.');
+        return null;
+      }
     } else {
-      print('Failed to upload document: ${response.reasonPhrase}');
+      final responseData = await http.Response.fromStream(response);
+      final errorMessage = responseData.body;
+      customToastInfo(message: 'Failed to upload document: $errorMessage');
       return null;
     }
   } catch (e) {
-    print('Error uploading document to Cloudinary: $e');
+    customToastInfo(message: 'Error uploading document to Cloudinary: $e');
     return null;
   }
-}
+}}
+
+

@@ -10,7 +10,7 @@ import 'package:get_it/get_it.dart';
 import 'package:land_house_verify/components/my_textFormField.dart';
 import 'package:land_house_verify/pages/admin/admin_page.dart';
 import 'package:land_house_verify/services/asset_register_service.dart';
-import 'package:land_house_verify/services/upload_image.dart';
+import 'package:land_house_verify/services/cloudinary_file_upload_servise.dart';
 
 class RegisterAssetPage extends StatefulWidget {
   const RegisterAssetPage({super.key});
@@ -70,11 +70,11 @@ class _RegisterAssetPageState extends State<RegisterAssetPage> {
     }
 
     setState(() => _isLoading = true);
-          uploadedUrls = await uploadMultipleImagesToCloudinary(assetThumbnails);
+          uploadedUrls = await CloudinaryFileUploadService().uploadMultipleImagesToCloudinary(assetThumbnails);
           if (kDebugMode) {
             print('Thumbnail selected: $uploadedUrls');
           }
-          uploadedDocumentUrl = await uploadDocumentToCloudinary(_documentFile!);
+          uploadedDocumentUrl = await CloudinaryFileUploadService().uploadDocumentToCloudinary(_documentFile!);
           if (kDebugMode) {
             print('Document selected: $uploadedDocumentUrl');
           }

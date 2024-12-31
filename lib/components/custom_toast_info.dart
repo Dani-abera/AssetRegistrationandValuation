@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:toastification/toastification.dart';
 
 ToastificationItem customToastInfo({
-  required BuildContext context,
+   BuildContext? context,
   String? type = 'Success',
   String? message
 }) {
