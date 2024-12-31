@@ -150,7 +150,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       _selectedRole = newValue!; // Update role selection
                     });
                   },
-                  items: ['Admin', 'validator'].map((role) {
+                  items: ['Admin', 'validator','Assetowner'].map((role) {
                     return DropdownMenuItem(
                       value: role,
                       child: Text(role),
