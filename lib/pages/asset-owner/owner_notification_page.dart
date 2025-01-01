@@ -1,128 +1,134 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:land_house_verify/services/padf_preview_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:land_house_verify/provider/notification_provider.dart';
+import 'package:toastification/toastification.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class OwnerNotificationPage extends StatelessWidget {
-  final String? owner;
-  const OwnerNotificationPage({super.key, this.owner});
+class OwnerNotificationPage extends ConsumerWidget {
+  final String owner;
+
+  const OwnerNotificationPage({super.key, required this.owner});
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text("Notification"),),
-      body: StreamBuilder(
-        stream: FirebaseFirestore.instance
-          .collection('valuation-report')
-          .where('to', isEqualTo: owner) // Filter by the current validator's name
-          .snapshots(),
-        builder: (context, AsyncSnapshot<QuerySnapshot> snapshot){
-          if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        if (snapshot.hasError) {
-          return const Center(child: Text('Error loading assets'));
-        }
-    
-        final assets = snapshot.data?.docs ?? [];
-    
-        if (assets.isEmpty) {
-          return const Center(child: Text('No assets found for you'));
-    
-        }
-          return ListView.builder(
-          itemCount: assets.length,
-          itemBuilder: (context, index) {
-            final data = assets[index].data() as Map<String, dynamic>;
-            final message = data['msg'] ?? 'Unknown owner';
-            final document = data['reportUrl']?? 'Unknown owner';
+  Widget build(BuildContext context, WidgetRef ref) {
+    final AsyncValue<FirestoreQuerySnapshot> notificationStream = 
+        ref.watch(notificationProvider(owner));
 
-            print(data);
-    
-            return Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: const Color.fromARGB(179, 231, 228, 228),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(5),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(message),
-                    Row(
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Notification"),
+      ),
+      body: notificationStream.when(
+        data: (snapshot) {
+          if (snapshot.docs.isEmpty) {
+            return const Center(child: Text("No notifications"));
+          }
+
+          return ListView.builder(
+            itemCount: snapshot.docs.length,
+            itemBuilder: (context, index) {
+              final data = snapshot.docs[index].data();
+              final reportUrl = data['reportUrl'];
+              final message = data['msg'];
+              final notificationId = snapshot.docs[index].id;
+              return Padding(padding: EdgeInsets.only(left:8, right: 8, top:10),
+                child: Card(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        ElevatedButton(
-                          onPressed: () async {
-                            if (document != 'Unknown owner' && Uri.tryParse(document)?.hasScheme == true) {
-                              final pdfUrl = document.replaceAll('/upload/', '/upload/fl_attachment/');
-                              print('Attempting to open PDF preview for URL: $pdfUrl');
-                              try {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => PdfPreviewPage(url: pdfUrl),
-                                  ),
-                                );
-                              } catch (e) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text('Could not open the document: $e')),
-                                );
-                              }
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Invalid document URL')),
-                              );
-                            }
-                          },
-                          child: const Text('View Document'),
+                        ClipRect(
+                          child: Icon(Icons.folder, size: 30,),
                         ),
-                        ElevatedButton(
-                          onPressed: () async {
-                            if (document != 'Unknown owner' && Uri.tryParse(document)?.hasScheme == true) {
-                              // Convert to PDF download URL
-                              final pdfUrl = document.replaceAll('/upload/', '/upload/fl_attachment/');
-                              print('Attempting to download document from URL: $pdfUrl');
-                              try {
-                                final response = await http.get(Uri.parse(pdfUrl));
-                                if (response.statusCode == 200) {
-                                  // Save the file using a suitable method, e.g., using path_provider
-                                  // Implement file saving logic here
-                                } else {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text('Failed to download document: ${response.statusCode}')),
-                                  );
-                                }
-                              } catch (e) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text('Could not download the document: $e')),
-                                );
-                              }
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Invalid document URL')),
-                              );
-                            }
-                          },
-                          child: const Text('Download Document'),
+                        SizedBox(width: 5,),
+                        Expanded(
+                          child: Text(
+                            message,
+                            style: TextStyle(
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            maxLines: 1,
+                          ),
+                        ),
+                       
+                    // More Options Button
+                    PopupMenuButton<String>(
+                      onSelected: (value) async {
+                        if (value == 'View') {
+                          // Open the report URL
+                          final Uri url = Uri.parse(reportUrl);
+                          if (reportUrl.isNotEmpty && await canLaunchUrl(url)) {
+                            await launchUrl(url);
+                          } else {
+                            toastification.show(
+                              context: context,
+                              title: Text('Error'),
+                              description: Text('Could not open the report URL or URL is invalid'),
+                              type: ToastificationType.error,
+                            );
+                          }
+                        } else if (value == 'Delete') {
+                          // Handle delete notification
+                          onDelete(context, notificationId);
+                        }
+                      },
+                      itemBuilder: (context) => [
+                        const PopupMenuItem(
+                          value: 'View',
+                          child: ListTile(
+                            leading: Icon(Icons.open_in_browser),
+                            title: Text('View'),
+                          ),
+                        ),
+                        const PopupMenuItem(
+                          value: 'Delete',
+                          child: ListTile(
+                            leading: Icon(Icons.delete, color: Colors.red),
+                            title: Text('Delete'),
+                          ),
                         ),
                       ],
+                      icon: const Icon(Icons.more_vert),
                     ),
-                  ],
+                      ]
+                    ),
+                  ),
                 ),
-              ),
-            ),
-            );
-          },
-        );
-        }
-        ),
+              );
+            },
+          );
+        },
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (err, stack) => Center(child: Text("Error: $err")),
+      ),
     );
-    
+  }
+  
+  Future<void> onDelete(BuildContext context, String notificationId) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection("valuation-report")
+          .doc(notificationId)
+          .delete();
+      
+        toastification.show(
+          context: context,
+          title: const Text('Notification Deleted'),
+          description: const Text('The notification has been removed.'),
+          type: ToastificationType.success,
+        );
+
+    } catch (e) {
+
+        toastification.show(
+          context: context,
+          title: const Text("Can't Delete Notification"),
+          description: Text("Error deleting notification: $e"),
+          type: ToastificationType.error,
+        );
+
+    }
   }
 }

@@ -51,6 +51,7 @@ dependencies:
   toastification: ^2.3.0
   url_launcher: ^6.3.1
   flutter_pdfview: ^1.4.0
+  flutter_riverpod: ^2.6.1
 
 dev_dependencies:
   flutter_test:

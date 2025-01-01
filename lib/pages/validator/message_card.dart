@@ -68,28 +68,24 @@ class MessageCard extends StatelessWidget {
 
   Future<void> handleFileUpload() async {
     try {
-      String? valuationReport = await FilePickerService().pickDocument();
-      if (valuationReport != null) {
-         String? uploadedDocumentUrl = await CloudinaryFileUploadService()
-              .uploadDocumentToCloudinary(valuationReport);
-              print(uploadedDocumentUrl);
-        if(uploadedDocumentUrl != null){
-        try{
-            await FirebaseFirestore.instance.collection("valuation-report").add({
-            'reportUrl': uploadedDocumentUrl,
-            'to': from,
-            'msg': 'Jemo michael valuation report document',
-            'createdAt': FieldValue.serverTimestamp()
-          });
-          customToastInfo(message: 'report sent successfully!');
-          }catch(e){
-              customToastInfo(message: 'Error sending report. try again');
-          }
+      String valuationReport = await FilePickerService().pickDocument();
+       String? uploadedDocumentUrl = await CloudinaryFileUploadService()
+            .uploadDocumentToCloudinary(valuationReport);
+            print(uploadedDocumentUrl);
+      if(uploadedDocumentUrl != null){
+      try{
+          await FirebaseFirestore.instance.collection("valuation-report").add({
+          'reportUrl': uploadedDocumentUrl,
+          'to': from,
+          'msg': 'Jemo michael valuation report document',
+          'createdAt': FieldValue.serverTimestamp()
+        });
+        customToastInfo(message: 'report sent successfully!');
+        }catch(e){
+            customToastInfo(message: 'Error sending report. try again');
         }
-      } else {
-        customToastInfo(message: "No file selected.");
       }
-    } catch (e) {
+        } catch (e) {
       customToastInfo(message: "Error picking file: $e");
     }
   }

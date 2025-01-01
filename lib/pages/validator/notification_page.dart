@@ -37,8 +37,6 @@ class NotificationPage extends StatelessWidget {
             final assetName = data['assetName'] ?? 'Unknown Asset Name';
             final message = data['msg'] ?? 'Not msg';
             final notificationId = assets[index].id;
-
-            print(data);
     
             return Padding(
               padding: const EdgeInsets.all(8.0),
