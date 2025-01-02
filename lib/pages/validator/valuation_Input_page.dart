@@ -816,90 +816,143 @@ class _ValidationInputScreenState extends State<ValidationInputScreen> {
   }
 
   Future<void> _submitValidation() async {
-    if (!_formKey.currentState!.validate()) return;
+    // 1. Validate form
+    if (!_formKey.currentState!.validate()) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please fill in all required fields'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
 
+    // 2. Check revaluation requirements
     if (_valuationStatus == 'Revaluation') {
       final hasPreValidation = await _checkPreviousValidation();
       if (!hasPreValidation) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-              content:
-                  Text('Asset must be validated first before revaluation')),
+            content: Text('Asset must be validated first before revaluation'),
+            backgroundColor: Colors.orange,
+          ),
         );
         return;
       }
     }
 
+    // 3. Check exchange rates
     if (_exchangeRates == null) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Failed to fetch exchange rates. Please try again.'),
-          ),
-        );
-      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Failed to fetch exchange rates. Please try again.'),
+          backgroundColor: Colors.red,
+        ),
+      );
       return;
     }
+
+    // 4. Start loading
     setState(() => _isLoading = true);
 
     try {
-      Map<String, double> convertedRates = {};
-      _exchangeRates!.forEach((key, value) {
-        if (value is int) {
-          convertedRates[key] = value.toDouble();
-        } else if (value is double) {
-          convertedRates[key] = value;
-        } else {
-          convertedRates[key] = double.tryParse(value.toString()) ?? 0.0;
-        }
-      });
+      // 5. Calculate costs
+      final totalCost = _selectedAssetType == 'Land'
+          ? (double.tryParse(_landAreaController.text) ?? 0) *
+              (double.tryParse(_landUnitRateController.text) ?? 0)
+          : _calculateTotalConstructionCost() + _calculateTotalRelatedCost();
+
+      // 6. Convert exchange rates
+      final convertedRates = Map<String, double>.from(_exchangeRates!);
+
+      // 7. Create validation model
       final validation = ValidatedDataModel(
         id: widget.assetId ?? DateTime.now().millisecondsSinceEpoch.toString(),
-        name: _nameController.text,
-        valuatorName: _valuatorNameController.text,
-        valuationExecutor: _valuationExecutorController.text,
+        name: _nameController.text.trim(),
+        valuatorName: _valuatorNameController.text.trim(),
+        valuationExecutor: _valuationExecutorController.text.trim(),
         assetType: _selectedAssetType,
-        valuationMethod: _selectedValuationMethod,
-        constructionCosts:
-            _constructionCosts.map((c) => c.toConstructionCost()).toList(),
+        valuationMethod: _selectedValuMethod,
+        constructionCosts: _constructionCosts
+            .map((c) => ConstructionCost(
+                  description: c.descriptionController.text.trim(),
+                  areaInM2: double.tryParse(c.areaController.text) ?? 0,
+                  numberOfTypicalBuildings:
+                      int.tryParse(c.numberOfBuildingsController.text) ?? 0,
+                  unitRate: double.tryParse(c.unitRateController.text) ?? 0,
+                  amount: c.calculateAmount(),
+                ))
+            .toList(),
         buildingRelatedCosts: _buildingRelatedCosts
-            .map((c) => c.toBuildingRelatedCost())
+            .map((c) => BuildingRelatedCost(
+                  description: c.descriptionController.text.trim(),
+                  amount: double.tryParse(c.amountController.text) ?? 0,
+                ))
             .toList(),
         totalCostBuildingConstruction: _calculateTotalConstructionCost(),
         totalBuildingRelatedCost: _calculateTotalRelatedCost(),
-        totalCostBuilding:
-            _calculateTotalConstructionCost() + _calculateTotalRelatedCost(),
+        totalCostBuilding: totalCost,
         valuationStatus: _valuationStatus,
         valuationDate: DateTime.now(),
-        memlcFactor: double.parse(_memlcFactorController.text),
-        currencyFactor: double.parse(_currencyFactorController.text),
+        memlcFactor: double.tryParse(_memlcFactorController.text) ?? 1.0,
+        currencyFactor: double.tryParse(_currencyFactorController.text) ?? 1.0,
         totalCostAfterRevaluation: _calculateTotalCostAfterRevaluation(),
-        exchangeRates: convertedRates,
         assetInfo: widget.assetInfo,
+        landArea: double.tryParse(_landAreaController.text),
+        landUnitRate: double.tryParse(_landUnitRateController.text),
+        selectedValuMethod: _selectedValuMethod,
+        exchangeRates: convertedRates,
       );
 
-      final result = widget.assetId != null
-          ? await _validationService.updateValidation(
-              widget.assetId!, validation.toMap())
-          : await _validationService.createValidation(validation);
-
-      if (mounted) {
-        if (result != null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Validation saved successfully')),
-          );
-          //Navigator.pop(context); // Return to previous screen after saving
-        } else {
-          throw Exception('Failed to save validation');
-        }
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${e.toString()}')),
+      // 8. Save validation
+      String? result;
+      if (widget.assetId != null && widget.assetId!.isNotEmpty) {
+        print('Updating validation: ${widget.assetId}');
+        result = await _validationService.updateValidation(
+          widget.assetId!,
+          validation.toMap(),
         );
+      } else {
+        print('Creating new validation');
+        result = await _validationService.createValidation(validation);
       }
+
+      // 9. Handle result
+      if (!mounted) return;
+
+      if (result != null) {
+        print('Validation saved successfully with ID: $result');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Validation saved successfully'),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 2),
+          ),
+        );
+      } else {
+        throw Exception('Failed to save validation: no result returned');
+      }
+    } catch (e, stackTrace) {
+      // 11. Error handling
+      print('Error saving validation: $e');
+      print('Stack trace: $stackTrace');
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: ${e.toString()}'),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 4),
+          action: SnackBarAction(
+            label: 'Dismiss',
+            onPressed: () {},
+            textColor: Colors.white,
+          ),
+        ),
+      );
     } finally {
+      // 12. Reset loading state
       if (mounted) {
         setState(() => _isLoading = false);
       }
