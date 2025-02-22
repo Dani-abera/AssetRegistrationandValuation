@@ -1,3 +1,5 @@
+
+
 name: land_house_verify
 description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
@@ -52,6 +54,12 @@ dependencies:
   url_launcher: ^6.3.1
   flutter_pdfview: ^1.4.0
   flutter_riverpod: ^2.6.1
+  firebase_storage: ^12.3.7
+  cloudinary_public: ^0.23.1
+  syncfusion_flutter_pdfviewer: ^28.1.37
+  google_sign_in: ^6.2.2
+  googleapis: ^13.2.0
+  cached_network_image:
 
 dev_dependencies:
   flutter_test:
@@ -80,7 +88,7 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - images/
+    - assets/images/
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

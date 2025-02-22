@@ -3,9 +3,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:land_house_verify/components/custom_toast_info.dart';
 import 'package:land_house_verify/pages/asset-owner/asset_owner_page.dart';
 import 'package:land_house_verify/pages/validator/validator_page.dart';
+import 'package:toastification/toastification.dart';
 import '../../components/my_button.dart';
 import '../../components/my_textfield.dart';
 import '../../services/auth_service.dart';
@@ -67,7 +67,11 @@ class _LoginPageState extends State<LoginPage> {
 
     // Navigate based on role or show error message
     if (result == 'Admin') {
-      customToastInfo(context: context, message: "$result login succesfully");
+      toastification.show(
+            title: Text("success"),
+            type: ToastificationType.success,
+            description: Text('$result login succesfully!'),
+          );
       String adminId = await _fetchUserId(); // Fetch admin's id
       Navigator.pushReplacement(
         context,
@@ -78,7 +82,11 @@ class _LoginPageState extends State<LoginPage> {
       
     } else if (result == 'validator') {
       String validatorId = await _fetchUserId(); // Fetch validator's id
-      customToastInfo(context: context, message: "$result login succesfully");
+      toastification.show(
+            title: Text("success"),
+            type: ToastificationType.success,
+            description: Text('$result login succesfully!'),
+          );
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -94,11 +102,21 @@ class _LoginPageState extends State<LoginPage> {
           builder: (_) => AssetOwnerPage(isEqualTo: assetOwnerId, condition: 'ownership',), // Pass id to ValidatorPage
         ),
       );
-      customToastInfo(context: context, message: "$result login succesfully");
+     toastification.show(
+            title: Text("success"),
+            type: ToastificationType.success,
+            description: Text('$result login succesfully!'),
+            autoCloseDuration: Duration(seconds: 2)
+          );
     }
     
     else {
-      customToastInfo(context: context, message: 'Login Failed: $result');
+      toastification.show(
+            title: Text("Error"),
+            type: ToastificationType.error,
+            description: Text('Invalid email or password.'),
+            autoCloseDuration: Duration(seconds: 2)
+          );
       
     }
   }

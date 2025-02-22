@@ -39,131 +39,147 @@ class AssetsCard extends StatelessWidget {
     
         }
     
-        return ListView.builder(
-          itemCount: assets.length,
-          itemBuilder: (context, index) {
-            final data = assets[index].data() as Map<String, dynamic>;
-            final docId = assets[index].id;
-            final assetImage = (data['assetImage'] as List?)?.first ?? '';
-            final assetName = data['assetName'] ?? 'Unknown Asset';
-            final ownership = data['ownership'] ?? 'Unknown Owner';
-            final validator = data['validator'] ?? 'Not Assigned';
-    
-            return Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    height: 150,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    child: ClipRRect(
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(15),
-                        topRight: Radius.circular(15),
-                      ),
-                      child: assetImage.isNotEmpty
-                          ? Image.network(
-                              assetImage,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                return Center(
-                                  child: Text('Image not available'),
-                                );
-                              },
-                            )
-                          : Image.asset(
-                              'assets/images/image.png',
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                return Center(
-                                  child: Text('Image not available'),
-                                );
-                              },
-                            ),
-                    ),
-                  ),
-                  const SizedBox(height: 5),
-                  Text('Asset Name: $assetName'),
-                  const SizedBox(height: 5),
-                  Text('Asset Owner: $ownership'),
-                  const SizedBox(height: 5),
-                  Row(
-                    children: [
-                      const Text('Validator:'),
-                      const SizedBox(width: 10),
-                      Container(
-                        height: 20,
-                        width: 100,
-                        padding: const EdgeInsets.only(left: 5),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5),
-                          color: const Color.fromARGB(255, 207, 209, 214),
-                        ),
-                        child: Text(validator), // Display the validator name or fallback
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 15),
-                  Row(
-                    children: [
-                      Text("Status: "),
-                      SizedBox(width: 10),
-                      Container(
-                        height: 20,
-                        width: 100,
-                        padding: const EdgeInsets.only(left: 5),
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(5),
-                            color: const Color.fromARGB(255, 207, 209, 214)),
-                        child: Text(' ${data['status']}'),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 15),
-                  Container(
-                    height: 40,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(5),
-                      gradient: const LinearGradient(colors: [
-                        Colors.lightGreen,
-                        Colors.greenAccent
-                      ]),
-                    ),
-                    child: ElevatedButton(
-                      onPressed: () {
-                        // Navigate to detailed asset page
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                               role =='Assetowner'? 
-                               AssetOwnerDetailPage(assetId: docId, owner:assetowner):
-                               AssetValuatorDetailPage(assetId: docId),
-                          ),
-                        );
-                        //print(assetowner);
-                      },
-                      style: ElevatedButton.styleFrom(
-                          shadowColor: Colors.transparent,
-                          backgroundColor: Colors.transparent),
-                      child: const Text(
-                        "View Detail",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 17,
-                            fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ),
-                ],
+        return SingleChildScrollView(
+          child: SizedBox(
+            height: MediaQuery.of(context).size.height * 0.7,
+            child: GridView.builder(
+              physics: const NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2, // Number of columns in the grid
+                childAspectRatio: 0.73, // Adjust the aspect ratio as needed
               ),
-            );
-          },
+              itemCount: assets.length,
+              itemBuilder: (context, index) {
+                final data = assets[index].data() as Map<String, dynamic>;
+                final docId = assets[index].id;
+                final assetImage = (data['assetImage'] as List?)?.first ?? '';
+                final assetName = data['assetName'] ?? 'Unknown Asset';
+                final ownership = data['ownership'] ?? 'Unknown Owner';
+                final validator = data['validator'] ?? 'Not Assigned';
+                return Card(
+                  elevation: 4,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          height: 100,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(15),
+                              topRight: Radius.circular(15),
+                            ),
+                            child: assetImage.isNotEmpty
+                                ? Image.network(
+                                    assetImage,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Center(
+                                        child: Text('Image not available'),
+                                      );
+                                    },
+                                  )
+                                : Image.asset(
+                                    'assets/images/image.png',
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Center(
+                                        child: Text('Image not available'),
+                                      );
+                                    },
+                                  ),
+                          ),
+                        ),
+                        const SizedBox(height: 5),
+                        Center(child: Text('$assetName',overflow: TextOverflow.ellipsis,)),
+                        const SizedBox(height: 5),
+                        Text('Owner: $ownership',overflow: TextOverflow.ellipsis,),
+                        const SizedBox(height: 5),
+                        Row(
+                          children: [
+                            const Text('Valuator:'),
+                            const SizedBox(width: 10),
+                            Container(
+                              height: 15,
+                              width: 100,
+                              padding: const EdgeInsets.only(left: 5),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(5),
+                                color: const Color.fromARGB(255, 207, 209, 214),
+                              ),
+                              child: Center(child: Text(
+                                validator)), // Display the validator name or fallback
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 5),
+                        Row(
+                          children: [
+                            Text("Status: "),
+                            SizedBox(width: 10),
+                            Container(
+                              height: 18,
+                              width: 100,
+                              padding: const EdgeInsets.only(left: 5),
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(5),
+                                  color: data['status'] =='Valuated'?Colors.green:Colors.amber),
+                              child: Center(child: Text(' ${data['status']}')),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 5),
+                        Container(
+                          height: 30,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(5),
+                            gradient: const LinearGradient(colors: [
+                              Colors.lightGreen,
+                              Colors.greenAccent
+                            ]),
+                          ),
+                          child: ElevatedButton(
+                            onPressed: () {
+                              // Navigate to detailed asset page
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                     role =='Assetowner'? 
+                                     AssetOwnerDetailPage(assetId: docId, owner:assetowner):
+                                     AssetValuatorDetailPage(assetId: docId),
+                                ),
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                                shadowColor: Colors.transparent,
+                                backgroundColor: Colors.transparent),
+                            child: const Text(
+                              "View Detail",
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
         );
       },
     );

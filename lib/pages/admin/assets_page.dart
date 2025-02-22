@@ -71,7 +71,7 @@ class _AssetsPageState extends State<AssetsPage> {
         ],
       ),
       body:  Padding(
-        padding: const EdgeInsets.all(20.0),
+        padding: const EdgeInsets.all(10.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -81,10 +81,10 @@ class _AssetsPageState extends State<AssetsPage> {
             ),
             const SizedBox(height: 10),
             // Latest Assets Page
-             SizedBox(height: 130, child: LatestAssetsPage()),
+             SizedBox(height: 200, child: LatestAssetsPage()),
             const SizedBox(height: 10),
             const Text(
-              "All Assets",
+              "All Registered Assets",
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),

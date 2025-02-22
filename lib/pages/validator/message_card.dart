@@ -1,12 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:land_house_verify/components/custom_toast_info.dart';
 import 'package:land_house_verify/services/cloudinary_file_upload_servise.dart';
 import 'package:land_house_verify/services/file_picker_service.dart';
+import 'package:toastification/toastification.dart';
 import 'labeled_row.dart';
-import 'package:path/path.dart' as path;
 
-class MessageCard extends StatelessWidget {
+class MessageCard extends StatefulWidget {
   final String from;
   final String assetName;
   final String message;
@@ -16,50 +15,55 @@ class MessageCard extends StatelessWidget {
     super.key,
     required this.from,
     required this.assetName,
-    required this.message, required this.notificationId,
+    required this.message,
+    required this.notificationId,
   });
+  
+  @override
+  State<MessageCard> createState() => _MessageCardState();
+}
 
+class _MessageCardState extends State<MessageCard> {
   @override
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: const Color.fromARGB(179, 231, 228, 228),
-        borderRadius: BorderRadius.circular(10),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(15),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withAlpha(127),
+            spreadRadius: 2,
+            blurRadius: 5,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
       child: Padding(
-        padding: const EdgeInsets.all(10),
+        padding: const EdgeInsets.all(15),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            LabeledRow(label: "From", value: from),
-            const SizedBox(height: 5),
-            LabeledRow(label: "AssetName", value: assetName),
-            const SizedBox(height: 5),
-            LabeledRow(label: "Message", value: message),
+            LabeledRow(label: "From", value: widget.from),
+            const SizedBox(height: 8),
+            LabeledRow(label: "Asset Name", value: widget.assetName),
+            const SizedBox(height: 8),
+            LabeledRow(label: "Message", value: widget.message),
             const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children:[
-              TextButton(
-              onPressed: () async {
-                await handleFileUpload();
-              },
-              child: const Text(
-                "Send Valuation Report",
-                style: TextStyle(color: Colors.blue),
-              ),
+              children: [
+                TextButton(
+                  onPressed: handleFileUpload,
+                  child: const Text("Send Valuation Report", style: TextStyle(color: Colors.blue)),
+                ),
+                TextButton(
+                  onPressed: deleteNotification,
+                  child: const Text("Delete Notification", style: TextStyle(color: Colors.red)),
+                ),
+              ],
             ),
-            const SizedBox(height: 10),
-            TextButton(
-              onPressed: () async {
-                await deleteNotification();
-              },
-              child: const Text(
-                "Delete Notification",
-                style: TextStyle(color: Colors.red),
-              ),
-            ),])
           ],
         ),
       ),
@@ -69,24 +73,29 @@ class MessageCard extends StatelessWidget {
   Future<void> handleFileUpload() async {
     try {
       String valuationReport = await FilePickerService().pickDocument();
-       String? uploadedDocumentUrl = await CloudinaryFileUploadService()
-            .uploadDocumentToCloudinary(valuationReport);
-            print(uploadedDocumentUrl);
-      if(uploadedDocumentUrl != null){
-      try{
-          await FirebaseFirestore.instance.collection("valuation-report").add({
+      String? uploadedDocumentUrl = await CloudinaryFileUploadService()
+          .uploadFileToFirebase(valuationReport, 'valuation-report');
+      
+      if (uploadedDocumentUrl != null) {
+        await FirebaseFirestore.instance.collection("valuation-report").add({
           'reportUrl': uploadedDocumentUrl,
-          'to': from,
-          'msg': 'Jemo michael valuation report document',
+          'to': widget.from,
+          'msg': '${widget.assetName} valuation report document',
           'createdAt': FieldValue.serverTimestamp()
         });
-        customToastInfo(message: 'report sent successfully!');
-        }catch(e){
-            customToastInfo(message: 'Error sending report. try again');
-        }
+        
+        toastification.show(
+          title: const Text("Success"),
+          type: ToastificationType.success,
+          description: const Text("Report sent successfully!"),
+        );
       }
-        } catch (e) {
-      customToastInfo(message: "Error picking file: $e");
+    } catch (e) {
+      toastification.show(
+        title: const Text("Error"),
+        type: ToastificationType.error,
+        description: Text("Error: $e"),
+      );
     }
   }
 
@@ -94,11 +103,20 @@ class MessageCard extends StatelessWidget {
     try {
       await FirebaseFirestore.instance
           .collection("report_request")
-          .doc(notificationId)
+          .doc(widget.notificationId)
           .delete();
-      customToastInfo(message: "Notification deleted successfully.");
+      
+      toastification.show(
+        title: const Text("Success"),
+        type: ToastificationType.success,
+        description: const Text("Notification deleted successfully."),
+      );    
     } catch (e) {
-      customToastInfo(message: "Error deleting notification: $e");
+      toastification.show(
+        title: const Text("Error"),
+        type: ToastificationType.error,
+        description: Text("Error deleting notification: $e"),
+      );  
     }
   }
 }

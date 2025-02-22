@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:land_house_verify/pages/validator/single_room_evaluation.dart';
 import 'package:land_house_verify/pages/validator/valuation_Input_page.dart';
 import 'package:photo_view/photo_view.dart';
+
+import '../../model/room_model.dart';
+import '../../services/add_room_service.dart';
 
 class AssetValuatorDetailPage extends StatefulWidget {
   final String assetId;
@@ -16,6 +20,9 @@ class _AssetDetailPageState extends State<AssetValuatorDetailPage> {
   String? valuationStatus;
   List<DocumentSnapshot> validators = [];
   String? validatorName;
+  final AddRoomService _roomService = AddRoomService();
+  List<RoomModel> rooms = [];
+  bool _isLoading = true;
 
   static const String STATUS_NOT_VALUATED = 'Not valuated';
   static const String STATUS_IN_PROGRESS = 'In progress';
@@ -26,6 +33,7 @@ class _AssetDetailPageState extends State<AssetValuatorDetailPage> {
     super.initState();
     _fetchValidators();
     _initializeStatus();
+    _fetchRooms();
   }
 
   Future<void> _fetchValidators() async {
@@ -100,7 +108,13 @@ class _AssetDetailPageState extends State<AssetValuatorDetailPage> {
       style: const TextStyle(fontSize: 16),
     );
   }
-
+  Future<void> _fetchRooms() async {
+    List<RoomModel> fetchedRooms = await _roomService.fetchRoomsForAsset(widget.assetId);
+    setState(() {
+      rooms = fetchedRooms;
+      _isLoading = false;
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -181,7 +195,7 @@ class _AssetDetailPageState extends State<AssetValuatorDetailPage> {
                 _styledText('Location', data['location'] ?? ''),
                 _styledText('Title Deed No', data['titleDeedNumber'] ?? ''),
                 _styledText('Asset Type', data['assetType'] ?? ''),
-                _styledText('Asset Valuator', data['validator'] ?? ''),
+                _styledText('Asset Evaluator', data['validator'] ?? ''),
                 Row(
                   children: [
                     const Text("Valuation Status:"),
@@ -221,6 +235,72 @@ class _AssetDetailPageState extends State<AssetValuatorDetailPage> {
                 const SizedBox(height: 20),
                 const Divider(),
                 _styledText('Description', data['description'] ?? ''),
+                const SizedBox(height: 20),
+                const Divider(),
+                const Text(
+                  'Available Rooms',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(
+                  height: 140, // Adjust height to fit content properly
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal, // Enable horizontal scrolling
+                    itemCount: rooms.length,
+                    itemBuilder: (context, index) {
+                      final room = rooms[index];
+                      return SizedBox(
+                        //padding: EdgeInsets.all(16.0),
+                        width: 350, // Adjust width so each card is visible
+                        child: GestureDetector(
+                          onTap: (){
+                            Navigator.push(context, MaterialPageRoute(builder: (context) =>
+                                SingleRoomEvaluation(
+                                  assetName: data['assetName'],
+                                  roomId: room.roomId,
+                                  assetTotalArea: data['area'],
+                                  assetTotalCost: "547568",
+                                  roomTotalArea: room.area,
+                                )));
+                          },
+                          child: Card(
+                            margin: const EdgeInsets.all(8.0),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Row( // Row layout for horizontal scroll
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  room.roomCurrentPhoto.isNotEmpty
+                                      ? Image.network(
+                                    room.roomCurrentPhoto.first,
+                                    width: 80,
+                                    height: 80,
+                                    fit: BoxFit.cover,
+                                  )
+                                      : const Icon(Icons.image_not_supported, size: 80),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text('Room ID: ${room.roomId}', style: TextStyle(fontWeight: FontWeight.bold)),
+                                        Text('Area: ${room.area} m²'),
+                                        Text(
+                                          'Status: ${room.status}',
+                                          style: TextStyle(color: Colors.blue),
+                                        ),
+                                        Text('Description: ${room.description}', style: TextStyle(overflow: TextOverflow.ellipsis),maxLines: 2,),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
                 const SizedBox(height: 20),
                 Container(
                   height: 40,

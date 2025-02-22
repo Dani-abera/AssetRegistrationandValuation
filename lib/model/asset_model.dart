@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:land_house_verify/model/room_model.dart';
 
 class AssetModel {
   final String id;
@@ -14,7 +15,9 @@ class AssetModel {
   final String validator;
   final String status;
   final List<String> assetImage;
+  final List<RoomModel> rooms;
   final DateTime createdAt;
+
 
   AssetModel({
     required this.id,
@@ -30,7 +33,8 @@ class AssetModel {
     required this.createdAt,
     required this.assetImage,
     required this.status,
-    required this.validator
+    required this.validator,
+    this.rooms = const [],
   });
 
   Map<String, dynamic> toMap() {
@@ -48,6 +52,7 @@ class AssetModel {
       'validator': validator,
       'assetImage':assetImage,
       'status': status,
+      'rooms': rooms.map((room) => room.toMap()).toList(), // Convert rooms to map
       'createdAt': FieldValue.serverTimestamp(),
     };
   }
@@ -67,6 +72,10 @@ class AssetModel {
        assetImage: ['assetImage'], 
        status: map['status'], 
        validator: map['validator'],
+      rooms: (map['rooms'] as List?)
+          ?.map((room) => RoomModel.fromMap(room, documentId))
+          .toList() ??
+          [], // Convert rooms from map to RoomModel
       createdAt: (map['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
     );
   }

@@ -4,7 +4,7 @@ import 'package:flutter_pdfview/flutter_pdfview.dart';
 class PdfPreviewPage extends StatelessWidget {
   final String url;
 
-  const PdfPreviewPage({Key? key, required this.url}) : super(key: key);
+  const PdfPreviewPage({super.key, required this.url});
 
   @override
   Widget build(BuildContext context) {

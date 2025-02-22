@@ -2,8 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:land_house_verify/components/custom_toast_info.dart';
 import 'package:photo_view/photo_view.dart';
+import 'package:toastification/toastification.dart';
 
 class AssetOwnerDetailPage extends StatefulWidget {
   final String assetId;
@@ -35,14 +35,16 @@ class _AssetDetailPageState extends State<AssetOwnerDetailPage> {
       print(requestdata);
       try {
         await FirebaseFirestore.instance.collection('report_request').add(requestdata);
-        customToastInfo(
-          context: context, 
-          message: 'Your report valuation request for approval to $selectedValidator is successful!'
-        );
-
+        toastification.show(
+            title: Text("success"),
+            type: ToastificationType.success,
+            description: Text('Your report valuation request for approval to $selectedValidator is successful!'),
+          );
         } catch (e) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error submitting registration: $e')),
+          toastification.show(
+            title: Text("Error"),
+            type: ToastificationType.error,
+            description: Text('Error submitting registration: $e'),
           );
         }
 
