@@ -41,10 +41,7 @@ class MyApp extends StatelessWidget {
 
       theme: Provider.of<ThemeProvider>(context).themeData,
 
-      //home: LoginOrRegister(),
-      home: ValidationInputScreen(
-        assetId: '1',
-      ),
+      home: LoginOrRegister(),
     );
   }
 }
