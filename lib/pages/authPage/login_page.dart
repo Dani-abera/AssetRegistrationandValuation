@@ -90,12 +90,13 @@ class _LoginPageState extends State<LoginPage> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (_) => AssetOwnerPage(isEqualTo: assetOwnerId, condition: 'ownership',), // Pass id to ValidatorPage
+          builder: (_) => AssetOwnerPage(
+            isEqualTo: assetOwnerId,
+            condition: 'ownership',
+          ), // Pass id to ValidatorPage
         ),
       );
-    }
-    
-    else {
+    } else {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('Login Failed: $result'), // Show error message
       ));
@@ -123,7 +124,8 @@ class _LoginPageState extends State<LoginPage> {
             Text(
               "Land and House Registration and Validation System",
               style: TextStyle(
-                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                fontSize: 12,
                 color: Theme.of(context).colorScheme.inversePrimary,
               ),
             ),

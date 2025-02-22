@@ -44,6 +44,7 @@ class _ValidationInputScreenState extends State<ValidationInputScreen> {
   final _nameController = TextEditingController();
   final _valuatorNameController = TextEditingController();
   final _valuationExecutorController = TextEditingController();
+  final _summaryController = TextEditingController();
 
   // Lists for dynamic costs
   final List<ConstructionCostController> _constructionCosts = [];
@@ -94,12 +95,14 @@ class _ValidationInputScreenState extends State<ValidationInputScreen> {
       final createdAt = widget.assetInfo!['createdAt'];
       final DateTime createdDateTime =
           createdAt is Timestamp ? createdAt.toDate() : DateTime.now();
+      _summaryController.text = widget.assetInfo!['summary'] ?? '';
     } else {
       // Set default values when no asset info is provided
       _nameController.text = '';
       _valuatorNameController.text = '';
       _valuationExecutorController.text = '';
       _selectedAssetType = 'Land';
+      _summaryController.text = '';
     }
   }
 
@@ -217,6 +220,7 @@ class _ValidationInputScreenState extends State<ValidationInputScreen> {
         landUnitRate: double.tryParse(_landUnitRateController.text),
         selectedValuMethod: _selectedValuMethod,
         exchangeRates: _exchangeRates,
+        summary: _summaryController.text,
       );
 
       final reportService = getIt<ReportService>();
@@ -283,6 +287,7 @@ class _ValidationInputScreenState extends State<ValidationInputScreen> {
                   children: [
                     _buildBasicInformation(),
                     const SizedBox(height: 24),
+
                     // Show different forms based on asset type
                     if (_selectedAssetType == 'Land')
                       _buildLandValuationForm()
@@ -294,6 +299,18 @@ class _ValidationInputScreenState extends State<ValidationInputScreen> {
                           _buildBuildingRelatedCostsSection(),
                         ],
                       ),
+                    const SizedBox(height: 24),
+                    TextFormField(
+                      controller: _summaryController,
+                      decoration: const InputDecoration(
+                        labelText: 'Assumptions of Asset Valuation',
+                        border: OutlineInputBorder(),
+                      ),
+                      maxLines: 3,
+                      validator: (value) => value?.isEmpty ?? true
+                          ? 'Please enter a summary'
+                          : null,
+                    ),
                     const SizedBox(height: 24),
                     if (_valuationStatus == 'Revaluation')
                       _buildRevaluationFactors(),
@@ -470,8 +487,9 @@ class _ValidationInputScreenState extends State<ValidationInputScreen> {
               keyboardType: TextInputType.number,
               validator: (value) {
                 if (value?.isEmpty ?? true) return 'Please enter land area';
-                if (double.tryParse(value!) == null)
+                if (double.tryParse(value!) == null) {
                   return 'Please enter valid number';
+                }
                 return null;
               },
             ),
@@ -502,8 +520,9 @@ class _ValidationInputScreenState extends State<ValidationInputScreen> {
               keyboardType: TextInputType.number,
               validator: (value) {
                 if (value?.isEmpty ?? true) return 'Please enter unit rate';
-                if (double.tryParse(value!) == null)
+                if (double.tryParse(value!) == null) {
                   return 'Please enter valid number';
+                }
                 return null;
               },
             ),
@@ -980,6 +999,7 @@ class _ValidationInputScreenState extends State<ValidationInputScreen> {
     for (var controller in _buildingRelatedCosts) {
       controller.dispose();
     }
+    _summaryController.dispose();
     super.dispose();
   }
 }

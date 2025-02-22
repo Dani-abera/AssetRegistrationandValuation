@@ -6,9 +6,13 @@ class ValidationService {
   static const String _collection = 'validations';
 
   // Create or update validation
+
   Future<String?> createValidation(ValidatedDataModel validation) async {
     try {
       print('Starting validation creation/update process...');
+
+      // Get image URLs from Firestore
+      final imageUrls = await _getAssetImages(validation.name);
 
       // If we have an ID, check if document exists
       if (validation.id.isNotEmpty) {
@@ -19,6 +23,7 @@ class ValidationService {
           print('Updating existing validation: ${validation.id}');
           await docRef.update({
             ...validation.toMap(),
+            'imageUrls': imageUrls,
             'updatedAt': FieldValue.serverTimestamp(),
           });
           return validation.id;
@@ -30,6 +35,7 @@ class ValidationService {
       final data = {
         ...validation.toMap(),
         'id': docRef.id,
+        'imageUrls': imageUrls,
         'createdAt': FieldValue.serverTimestamp(),
         'updatedAt': FieldValue.serverTimestamp(),
       };
@@ -41,6 +47,27 @@ class ValidationService {
       print('Error in createValidation: $e');
       print('Stack trace: $stackTrace');
       return null;
+    }
+  }
+
+// Add this method to fetch images
+  Future<List<String>> _getAssetImages(String assetName) async {
+    try {
+      final assetDoc = await _firestore
+          .collection('assets')
+          .where('assetName', isEqualTo: assetName)
+          .get();
+
+      if (assetDoc.docs.isNotEmpty) {
+        final data = assetDoc.docs.first.data();
+        if (data.containsKey('images')) {
+          return List<String>.from(data['images']);
+        }
+      }
+      return [];
+    } catch (e) {
+      print('Error fetching asset images: $e');
+      return [];
     }
   }
 

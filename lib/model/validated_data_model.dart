@@ -22,6 +22,8 @@ class ValidatedDataModel {
   final double? landArea;
   final double? landUnitRate;
   final double? totalCostBuilding;
+  final List<String>? imageUrls;
+  final String summary;
 
   ValidatedDataModel({
     required this.id,
@@ -45,6 +47,8 @@ class ValidatedDataModel {
     this.landUnitRate = 0.0,
     this.selectedValuMethod = '',
     this.exchangeRates,
+    this.imageUrls,
+    this.summary = '',
   });
 
   Map<String, dynamic> toMap() {
@@ -71,6 +75,8 @@ class ValidatedDataModel {
       'landUnitRate': landUnitRate,
       'selectedValuMethod': selectedValuMethod,
       'exchangeRates': exchangeRates,
+      'imageUrls': imageUrls ?? [],
+      'summary': summary,
     };
   }
 
@@ -120,6 +126,8 @@ class ValidatedDataModel {
       landUnitRate: map['landUnitRate']?.toDouble() ?? 0.0,
       selectedValuMethod: map['selectedValuMethod'] ?? '',
       exchangeRates: convertedRates,
+      imageUrls: List<String>.from(map['imageUrls'] ?? []),
+      summary: map['summary'] ?? '',
     );
   }
 }
