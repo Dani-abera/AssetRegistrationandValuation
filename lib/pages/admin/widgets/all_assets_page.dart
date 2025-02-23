@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:land_house_verify/pages/admin/asset_detail_page.dart';
 
-import '../../validator/validator_asset_detail.dart';
 
 
 class AllAssetsPage extends StatelessWidget {
