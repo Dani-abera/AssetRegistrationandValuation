@@ -45,7 +45,7 @@ class LatestAssetsPage extends StatelessWidget {
                 );
               },
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                padding: const EdgeInsets.symmetric(horizontal: 5.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -53,9 +53,9 @@ class LatestAssetsPage extends StatelessWidget {
                       borderRadius: BorderRadius.circular(15),
                       child: Image.network(
                         assetImage,
-                        height: 100,
+                        height: 170,
                         width: 300,
-                        fit: BoxFit.cover,
+                        fit: BoxFit.fill,
                         errorBuilder: (_, __, ___) => Container(
                           height: 100,
                           width: 150,
@@ -66,15 +66,16 @@ class LatestAssetsPage extends StatelessWidget {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    Text(
-                      assetName,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20.0 , vertical: 4.0),
+                      child: Text(
+                        assetName,
+                        style: const TextStyle(
+                          fontSize: 14,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),

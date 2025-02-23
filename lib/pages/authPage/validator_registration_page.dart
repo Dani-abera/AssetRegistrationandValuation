@@ -2,6 +2,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart' as path_lib;
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:toastification/toastification.dart';
 
 class RegisterValidatorPage extends StatefulWidget {
   final VoidCallback? onTap;
@@ -36,8 +37,10 @@ class _RegisterValidatorPageState extends State<RegisterValidatorPage> {
         
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error picking document: $e')),
+      toastification.show(
+        autoCloseDuration: Duration(milliseconds: 2000),
+        type: ToastificationType.error,
+        description: Text('Error picking document.'), 
       );
     }
   }
@@ -45,8 +48,10 @@ class _RegisterValidatorPageState extends State<RegisterValidatorPage> {
   /// Submit the form
   Future<void> _submitForm() async {
     if (!_formKey.currentState!.validate() || _cvFilePath == null || _certificationFilePath == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please complete all required fields.')),
+      toastification.show(
+        autoCloseDuration: Duration(milliseconds: 2000),
+        type: ToastificationType.error,
+        description: Text('Please complete all required fields.'), 
       );
       return;
     }
@@ -68,9 +73,10 @@ class _RegisterValidatorPageState extends State<RegisterValidatorPage> {
 
     try {
       await FirebaseFirestore.instance.collection('pending_validators').add(validatorData);
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Registration sent to admin for approval.')),
+      toastification.show(
+        autoCloseDuration: Duration(milliseconds: 2000),
+        type: ToastificationType.success,
+        description: Text('Registration sent to admin for approval.'),
       );
 
       // Clear the form
@@ -80,8 +86,10 @@ class _RegisterValidatorPageState extends State<RegisterValidatorPage> {
         _certificationFilePath = null;
       });
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error submitting registration: $e')),
+      toastification.show(
+        autoCloseDuration: Duration(milliseconds: 2000),
+        type: ToastificationType.error,
+        description: Text('Error submitting registration.'), 
       );
       setState(() => _isLoading = false);
     }

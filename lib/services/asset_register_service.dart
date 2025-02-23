@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 
 import '../model/asset_model.dart';
+import '../model/room_model.dart';
 
 class AssetRegisterService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -38,6 +39,7 @@ class AssetRegisterService {
         validator: valuator,
         status: status,
         assetImage: assetThumbnails,
+        rooms: [],
         createdAt: DateTime.now(),
       );
 
@@ -45,6 +47,35 @@ class AssetRegisterService {
       await _firestore.collection('assets').add(asset.toMap());
 
       return null; // Success
+    } catch (e) {
+      return e.toString(); // Return error message
+    }
+  }
+  // Add a room to an existing asset
+  Future<String?> addRoomToAsset({
+    required String assetId,
+    required RoomModel room, // The room to be added
+  }) async {
+    try {
+      // 1. Fetch the asset document
+      final assetDoc = await _firestore.collection('assets').doc(assetId).get();
+
+      if (assetDoc.exists) {
+        // 2. Get current list of rooms
+        List<dynamic> rooms = assetDoc.data()?['rooms'] ?? [];
+
+        // 3. Add the new room to the list of rooms
+        rooms.add(room.toMap()); // Convert the room to a map and add to list
+
+        // 4. Update the asset document with the new rooms list
+        await _firestore.collection('assets').doc(assetId).update({
+          'rooms': rooms, // Update the rooms field
+        });
+
+        return null; // Success
+      } else {
+        return 'Asset not found'; // Asset doesn't exist
+      }
     } catch (e) {
       return e.toString(); // Return error message
     }
