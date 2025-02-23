@@ -1,0 +1,20 @@
+                        -H/opt/homebrew/Caskroom/flutter/3.27.0/flutter/packages/flutter_tools/gradle/src/main/groovy
+-DCMAKE_SYSTEM_NAME=Android
+-DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+-DCMAKE_SYSTEM_VERSION=23
+-DANDROID_PLATFORM=android-23
+-DANDROID_ABI=x86_64
+-DCMAKE_ANDROID_ARCH_ABI=x86_64
+-DANDROID_NDK=/Users/dani/Library/Android/sdk/ndk/26.3.11579264
+-DCMAKE_ANDROID_NDK=/Users/dani/Library/Android/sdk/ndk/26.3.11579264
+-DCMAKE_TOOLCHAIN_FILE=/Users/dani/Library/Android/sdk/ndk/26.3.11579264/build/cmake/android.toolchain.cmake
+-DCMAKE_MAKE_PROGRAM=/Users/dani/Library/Android/sdk/cmake/3.22.1/bin/ninja
+-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=/Users/dani/StudioProjects/land_house_verify/build/app/intermediates/cxx/Debug/431m355y/obj/x86_64
+-DCMAKE_RUNTIME_OUTPUT_DIRECTORY=/Users/dani/StudioProjects/land_house_verify/build/app/intermediates/cxx/Debug/431m355y/obj/x86_64
+-DCMAKE_BUILD_TYPE=Debug
+-B/Users/dani/StudioProjects/land_house_verify/android/app/.cxx/Debug/431m355y/x86_64
+-GNinja
+-Wno-dev
+--no-warn-unused-cli
+                        Build command args: []
+                        Version: 2

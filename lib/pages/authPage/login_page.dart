@@ -69,10 +69,10 @@ class _LoginPageState extends State<LoginPage> {
     // Navigate based on role or show error message
     if (result == 'Admin') {
       toastification.show(
-            title: Text("success"),
-            type: ToastificationType.success,
-            description: Text('$result login succesfully!'),
-          );
+        title: Text("success"),
+        type: ToastificationType.success,
+        description: Text('$result login succesfully!'),
+      );
       String adminId = await _fetchUserId(); // Fetch admin's id
       Navigator.pushReplacement(
         context,
@@ -82,14 +82,13 @@ class _LoginPageState extends State<LoginPage> {
           ), // Pass id to AdminPage
         ),
       );
-      
     } else if (result == 'validator') {
       String validatorId = await _fetchUserId(); // Fetch validator's id
       toastification.show(
-            title: Text("success"),
-            type: ToastificationType.success,
-            description: Text('$result login succesfully!'),
-          );
+        title: Text("success"),
+        type: ToastificationType.success,
+        description: Text('$result login succesfully!'),
+      );
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -97,7 +96,6 @@ class _LoginPageState extends State<LoginPage> {
               ValidatorPage(name: validatorId), // Pass id to ValidatorPage
         ),
       );
-     
     } else if (result == 'Assetowner') {
       String assetOwnerId = await _fetchUserId(); // Fetch assetOwner's id
       Navigator.pushReplacement(
@@ -110,29 +108,24 @@ class _LoginPageState extends State<LoginPage> {
         ),
       );
 
-     toastification.show(
-            title: Text("success"),
-            type: ToastificationType.success,
-            description: Text('$result login succesfully!'),
-            autoCloseDuration: Duration(seconds: 2)
-          );
-    }
-    
-    else {
       toastification.show(
-            title: Text("Error"),
-            type: ToastificationType.error,
-            description: Text('Invalid email or password.'),
-            autoCloseDuration: Duration(seconds: 2)
-          );
-      
-
+          title: Text("success"),
+          type: ToastificationType.success,
+          description: Text('$result login succesfully!'),
+          autoCloseDuration: Duration(seconds: 2));
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Login Failed: $result'), // Show error message
-      ));
-
+      toastification.show(
+          title: Text("Error"),
+          type: ToastificationType.error,
+          description: Text('Invalid email or password.'),
+          autoCloseDuration: Duration(seconds: 2));
     }
+    // else {
+    //   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    //     content: Text('Login Failed: $result'), // Show error message
+    //   ));
+    //
+    // }
   }
 
   bool isPasswordHidden = true;

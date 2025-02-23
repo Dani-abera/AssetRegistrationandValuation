@@ -1,0 +1,2 @@
+/Users/dani/StudioProjects/land_house_verify/android/app/.cxx/RelWithDebInfo/6h1o4f4e/x86_64/CMakeFiles/edit_cache.dir
+/Users/dani/StudioProjects/land_house_verify/android/app/.cxx/RelWithDebInfo/6h1o4f4e/x86_64/CMakeFiles/rebuild_cache.dir

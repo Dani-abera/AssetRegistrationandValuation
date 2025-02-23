@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:land_house_verify/pages/landing/landing_page.dart';
-import 'package:land_house_verify/pages/validator/valuation_Input_page.dart';
-
-
 import 'package:land_house_verify/service_locator.dart';
 import 'package:land_house_verify/services/login_or_register.dart';
 import 'package:land_house_verify/themes/themes_provider.dart';
@@ -22,7 +18,8 @@ void main() async {
 
   runApp(
     ProviderScope(
-      child: ToastificationWrapper( // ✅ Wrap with ToastificationWrapper
+      child: ToastificationWrapper(
+        // ✅ Wrap with ToastificationWrapper
         child: const MyApp(),
       ),
     ),
@@ -45,10 +42,8 @@ class MyApp extends ConsumerWidget {
   }
 }
 
-
-
 class InitialScreen extends StatelessWidget {
-  const InitialScreen({Key? key}) : super(key: key);
+  const InitialScreen({super.key});
 
   Future<String> determineStartPage() async {
     final prefs = await SharedPreferences.getInstance();
@@ -69,21 +64,24 @@ class InitialScreen extends StatelessWidget {
       future: determineStartPage(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return CircularProgressIndicator();
+          return const Center(child: CircularProgressIndicator());
         } else if (snapshot.hasData) {
           switch (snapshot.data) {
             case 'landing':
-              return LandingPage();
+              return const LandingPage();
+            case 'login':
+              return const LoginOrRegister();
             default:
-              return LoginOrRegister();
+              return const Scaffold(
+                body: Center(child: Text('Unknown page')),
+              );
           }
         } else {
-          return Scaffold(body: Center(child: Text('Error loading app')),);
+          return const Scaffold(
+            body: Center(child: Text('Error loading app')),
+          );
         }
       },
-
-      home: LoginOrRegister(),
-
     );
   }
 }
