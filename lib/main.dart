@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:land_house_verify/pages/landing/landing_page.dart';
+import 'package:land_house_verify/pages/validator/valuation_Input_page.dart';
+
+
 import 'package:land_house_verify/service_locator.dart';
 import 'package:land_house_verify/services/login_or_register.dart';
 import 'package:land_house_verify/themes/themes_provider.dart';
@@ -42,6 +46,7 @@ class MyApp extends ConsumerWidget {
 }
 
 
+
 class InitialScreen extends StatelessWidget {
   const InitialScreen({Key? key}) : super(key: key);
 
@@ -76,6 +81,9 @@ class InitialScreen extends StatelessWidget {
           return Scaffold(body: Center(child: Text('Error loading app')),);
         }
       },
+
+      home: LoginOrRegister(),
+
     );
   }
 }

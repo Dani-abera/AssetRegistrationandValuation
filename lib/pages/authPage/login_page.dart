@@ -21,10 +21,11 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final AuthService _authService = AuthService(); // Instance of AuthService
-  final _emailController = TextEditingController(); // Controller for email input
-  final _passwordController = TextEditingController(); // Controller for password input
+  final _emailController =
+      TextEditingController(); // Controller for email input
+  final _passwordController =
+      TextEditingController(); // Controller for password input
   bool _isLoading = false; // To show spinner during login
-  bool obscureText = true;
 
   // Function to fetch the id of the user (both Admin and Validator)
   Future<String> _fetchUserId() async {
@@ -76,7 +77,9 @@ class _LoginPageState extends State<LoginPage> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (_) => AdminPage(name: adminId,), // Pass id to AdminPage
+          builder: (_) => AdminPage(
+            name: adminId,
+          ), // Pass id to AdminPage
         ),
       );
       
@@ -90,7 +93,8 @@ class _LoginPageState extends State<LoginPage> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (_) => ValidatorPage(name: validatorId), // Pass id to ValidatorPage
+          builder: (_) =>
+              ValidatorPage(name: validatorId), // Pass id to ValidatorPage
         ),
       );
      
@@ -99,9 +103,13 @@ class _LoginPageState extends State<LoginPage> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (_) => AssetOwnerPage(isEqualTo: assetOwnerId, condition: 'ownership',), // Pass id to ValidatorPage
+          builder: (_) => AssetOwnerPage(
+            isEqualTo: assetOwnerId,
+            condition: 'ownership',
+          ), // Pass id to ValidatorPage
         ),
       );
+
      toastification.show(
             title: Text("success"),
             type: ToastificationType.success,
@@ -118,6 +126,12 @@ class _LoginPageState extends State<LoginPage> {
             autoCloseDuration: Duration(seconds: 2)
           );
       
+
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Login Failed: $result'), // Show error message
+      ));
+
     }
   }
 
@@ -142,7 +156,8 @@ class _LoginPageState extends State<LoginPage> {
             Text(
               "Land and House Registration and Validation System",
               style: TextStyle(
-                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                fontSize: 12,
                 color: Theme.of(context).colorScheme.inversePrimary,
               ),
             ),
@@ -155,21 +170,17 @@ class _LoginPageState extends State<LoginPage> {
             MyTextField(
               controller: _passwordController,
               hintText: "Password",
-              obscureText: obscureText,
+              obscureText: isPasswordHidden,
               suffixIcon: IconButton(
-                    onPressed: () {
-                      setState(() {
-                        isPasswordHidden = !isPasswordHidden;
-                        obscureText =false;
-                      });
-                    },
-                    icon: Icon(
-                      isPasswordHidden
-                          ? Icons.visibility_off
-                          : Icons.visibility,
-                    ),
-                  ),
-           
+                onPressed: () {
+                  setState(() {
+                    isPasswordHidden = !isPasswordHidden;
+                  });
+                },
+                icon: Icon(
+                  isPasswordHidden ? Icons.visibility_off : Icons.visibility,
+                ),
+              ),
             ),
             SizedBox(height: 25),
             SizedBox(height: 25),

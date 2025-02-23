@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:land_house_verify/pages/authPage/registration_page.dart';
 import 'package:land_house_verify/pages/setting_page.dart';
 import 'package:land_house_verify/pages/validator/valuation_Input_page.dart';
-import '../pages/validator/Valiuated_asset_view_page.dart';
+import '../API/show_currency_table.dart';
+
+import '../pages/validator/validation_list_page.dart';
 import '../services/login_or_register.dart';
 import 'my_drawer_tile.dart';
 
@@ -38,13 +40,13 @@ class MyDrawerValidator extends StatelessWidget {
             onTap: () => Navigator.pop(context),
           ),
           MyDrawerTile(
-            text: 'C R E A T E  R E P O R T S',
-            icon: Icons.insert_drive_file_rounded,
+            text: 'C U R R E N C Y',
+            icon: Icons.currency_exchange,
             onTap: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => RegisterPage(onTap: () {}),
+                  builder: (context) => CurrencyConverterToETB(),
                 ),
               );
             },
@@ -70,7 +72,7 @@ class MyDrawerValidator extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => ValidationScreen(),
+                  builder: (context) => ValidationListScreen(),
                 ),
               );
             },
