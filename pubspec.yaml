@@ -60,6 +60,8 @@ dependencies:
   google_sign_in: ^6.2.2
   googleapis: ^13.2.0
   cached_network_image:
+  shared_preferences:
+  animated_text_kit:
 
 dev_dependencies:
   flutter_test:

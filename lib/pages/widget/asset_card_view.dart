@@ -89,7 +89,7 @@ class AssetsCard extends StatelessWidget {
                                     },
                                   )
                                 : Image.asset(
-                                    'assets/images/image.png',
+                                    'assets/images/img1.png',
                                     fit: BoxFit.cover,
                                     errorBuilder: (context, error, stackTrace) {
                                       return Center(
