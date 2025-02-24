@@ -33,13 +33,19 @@ class _AddRoomsPageState extends State<AddRoomsPage> {
   final _roomAreaController = TextEditingController();
   final _roomDescriptionController = TextEditingController();
 
-
   List<File> roomCurrentPhoto = [];
   PlatformFile? pickedImage;
   XFile? image;
   List<String> uploadedUrls = [];
   String? uploadedDocumentUrl;
   String assetId = '';
+
+  @override
+  void initState() {
+    super.initState();
+
+    _roomIdController.text = widget.id;
+  }
 
   /// Pick a document from the device using File Picker
 
@@ -52,11 +58,12 @@ class _AddRoomsPageState extends State<AddRoomsPage> {
     }
 
     setState(() => _isLoading = true);
-    uploadedUrls = await CloudinaryFileUploadService().uploadMultipleImagesToCloudinary(roomCurrentPhoto);
+    uploadedUrls = await CloudinaryFileUploadService()
+        .uploadMultipleImagesToCloudinary(roomCurrentPhoto);
 
     try {
       final result = await room.addRoom(
-        roomId: "${widget.id}/${_roomIdController.text}",
+        roomId: _roomIdController.text,
         area: _roomAreaController.text,
         description: _roomDescriptionController.text,
         roomCurrentPhoto: uploadedUrls,
@@ -65,7 +72,8 @@ class _AddRoomsPageState extends State<AddRoomsPage> {
       );
 
       if (result != null) {
-        final saveRoomResult = await room.saveRoomToAsset(assetId: widget.assetId, room: result);
+        final saveRoomResult =
+            await room.saveRoomToAsset(assetId: widget.assetId, room: result);
         if (saveRoomResult == null) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Room registered successfully!')),
@@ -85,6 +93,7 @@ class _AddRoomsPageState extends State<AddRoomsPage> {
       setState(() => _isLoading = false);
     }
   }
+
   // Image picker for thumbnails
   Future<void> _pickThumbnail() async {
     try {
@@ -132,10 +141,21 @@ class _AddRoomsPageState extends State<AddRoomsPage> {
                 children: [
                   _buildThumbnailsSection(),
                   const SizedBox(height: 16.0),
-                  MyTextformfield(
-                    label: 'Room Id',
-                    controller: _roomIdController,
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10.0),
+                    child: TextFormField(
+                      readOnly: true,
+                      controller: _roomIdController,
+                      decoration: InputDecoration(
+                        labelText: "Room Id",
+                        border: const OutlineInputBorder(),
+                      ),
+                    ),
                   ),
+                  // MyTextformfield(
+                  //   label: "Room Id",
+                  //   controller: _roomIdController,
+                  // ),
                   MyTextformfield(
                       label: 'Area (m2)', controller: _roomAreaController),
                   MyTextformfield(
@@ -147,13 +167,13 @@ class _AddRoomsPageState extends State<AddRoomsPage> {
                   _isLoading
                       ? const CircularProgressIndicator()
                       : SizedBox(
-                      height: 40,
-                      width: double.infinity,
-                      child: ElevatedButton(
-                      onPressed: _addRoom,
-                      child: const Text('Add Room'),
-                    ),
-                  )
+                          height: 40,
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: _addRoom,
+                            child: const Text('Add Room'),
+                          ),
+                        )
                 ],
               ),
             ),
@@ -162,20 +182,24 @@ class _AddRoomsPageState extends State<AddRoomsPage> {
       ),
     );
   }
+
   // Thumbnails Section
   Widget _buildThumbnailsSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Building Room Current Photo', style: TextStyle(fontSize: 16.0)),
+        const Text('Building Room Current Photo',
+            style: TextStyle(fontSize: 16.0)),
         const SizedBox(height: 8.0),
         Stack(
           children: [
             Container(
               height: 100,
               width: double.infinity,
-              decoration: BoxDecoration(border: Border.all(), borderRadius: BorderRadius.circular(8.0)),
-              child:ListView.builder(
+              decoration: BoxDecoration(
+                  border: Border.all(),
+                  borderRadius: BorderRadius.circular(8.0)),
+              child: ListView.builder(
                 scrollDirection: Axis.horizontal,
                 itemCount: roomCurrentPhoto.length,
                 itemBuilder: (context, index) {
@@ -200,14 +224,11 @@ class _AddRoomsPageState extends State<AddRoomsPage> {
                 child: GestureDetector(
                   onTap: _pickThumbnail,
                   child: CircleAvatar(
-
                     child: Icon(Icons.upload),
                   ),
-                )
-            ),
+                )),
           ],
         ),
-
       ],
     );
   }

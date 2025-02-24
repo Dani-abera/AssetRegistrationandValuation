@@ -1,9 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:land_house_verify/pages/admin/add_rooms.dart';
 import 'package:open_file/open_file.dart';
 import '../../API/fetch_exchange_rate.dart';
 import '../../model/validated_data_model.dart';
+import 'package:uuid/uuid.dart';
 import '../../service_locator.dart';
 import '../../services/report_service.dart';
 import '../../services/validation_data_service.dart';
@@ -90,11 +92,11 @@ class _ValidationInputScreenState extends State<ValidationInputScreen> {
       _valuationExecutorController.text = widget.assetInfo!['ownership'] ?? '';
 
       // You might want to add these to the form display
-      final location = widget.assetInfo!['location'] ?? '';
-      final titleDeedNumber = widget.assetInfo!['titleDeedNumber'] ?? '';
-      final createdAt = widget.assetInfo!['createdAt'];
-      final DateTime createdDateTime =
-          createdAt is Timestamp ? createdAt.toDate() : DateTime.now();
+      //final location = widget.assetInfo!['location'] ?? '';
+      //final titleDeedNumber = widget.assetInfo!['titleDeedNumber'] ?? '';
+      //  final createdAt = widget.assetInfo!['createdAt'];
+      // final DateTime createdDateTime =
+      //  createdAt is Timestamp ? createdAt.toDate() : DateTime.now();
       _summaryController.text = widget.assetInfo!['summary'] ?? '';
     } else {
       // Set default values when no asset info is provided
@@ -261,6 +263,34 @@ class _ValidationInputScreenState extends State<ValidationInputScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: SizedBox(
+        height: 100,
+        child: ElevatedButton(
+          onPressed: () {
+            var uuid = Uuid();
+            String randomId = uuid.v4(); // Generate a new random ID
+            String newId = '${widget.assetId}/$randomId';
+            // Ensure assetId is not null and provide a valid id for AddRoomsPage
+            if (widget.assetId != null) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => AddRoomsPage(
+                    assetId: widget.assetId!,
+                    id: newId, // Assuming you want to pass the assetId
+                  ),
+                ),
+              );
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                    content: Text('Asset ID is required to add rooms.')),
+              );
+            }
+          },
+          child: const Text('Add Single Room'),
+        ),
+      ),
       appBar: AppBar(
         title:
             Text(widget.assetId != null ? 'Edit Validation' : 'New Validation'),
@@ -315,7 +345,11 @@ class _ValidationInputScreenState extends State<ValidationInputScreen> {
                     if (_valuationStatus == 'Revaluation')
                       _buildRevaluationFactors(),
                     const SizedBox(height: 32),
+
                     _buildTotalCostDisplay(),
+                    const SizedBox(height: 18),
+
+                    const SizedBox(height: 32),
                   ],
                 ),
               ),

@@ -6,7 +6,6 @@ import 'package:get_it/get_it.dart';
 import 'package:land_house_verify/pages/admin/add_rooms.dart';
 import 'package:photo_view/photo_view.dart';
 
-import '../../components/my_button.dart';
 import '../../model/room_model.dart';
 import '../../services/add_room_service.dart';
 import '../../services/asset_register_service.dart';
@@ -86,7 +85,10 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
     try {
       await _fetchValidatorName(selectedValidator!);
 
-      await FirebaseFirestore.instance.collection('assets').doc(widget.assetId).update({
+      await FirebaseFirestore.instance
+          .collection('assets')
+          .doc(widget.assetId)
+          .update({
         'validator': validatorName,
         'assignedValidator': selectedValidator,
         'validatorAssignedAt': FieldValue.serverTimestamp(),
@@ -168,16 +170,19 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
           padding: const EdgeInsets.all(8.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min, // 🔥 Ensures column only takes required space
+            mainAxisSize:
+                MainAxisSize.min, // 🔥 Ensures column only takes required space
             children: [
               Text(
                 title,
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                style:
+                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1, // Prevents title from taking too much space
               ),
               const SizedBox(height: 5),
-              Expanded( // 🔥 Allows text to take remaining space without overflow
+              Expanded(
+                // 🔥 Allows text to take remaining space without overflow
                 child: Text(
                   value ?? 'N/A',
                   style: TextStyle(fontSize: 14, color: Colors.grey[700]),
@@ -194,22 +199,23 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
   }
 
   Future<void> _fetchRooms() async {
-    List<RoomModel> fetchedRooms = await _roomService.fetchRoomsForAsset(widget.assetId);
+    List<RoomModel> fetchedRooms =
+        await _roomService.fetchRoomsForAsset(widget.assetId);
     setState(() {
       rooms = fetchedRooms;
       _isLoading = false;
     });
   }
 
-
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Asset Details')),
       body: FutureBuilder(
-        future: FirebaseFirestore.instance.collection('assets').doc(widget.assetId).get(),
+        future: FirebaseFirestore.instance
+            .collection('assets')
+            .doc(widget.assetId)
+            .get(),
         builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -227,27 +233,35 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                  Expanded(
-                    child: Text(
-                      'Asset Name: ${data['assetName'] ?? 'Unknown'}',
-                      style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold
+                    Expanded(
+                      child: Text(
+                        'Asset Name: ${data['assetName'] ?? 'Unknown'}',
+                        style: const TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                     ),
-                  ),
-                  GestureDetector(
-                    onTap: (){
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => AddRoomsPage(id:data['assetId'], assetId:widget.assetId,)));
-                    },
-                    child: SizedBox(
-                      height: 40,
-                      width: 40,
-                      child: Image.asset("assets/images/add_rooms.png", fit: BoxFit.fill,),
-                    ),
-                  )
-                ],),
-                SizedBox(height:20),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => AddRoomsPage(
+                                      id: data['assetId'],
+                                      assetId: widget.assetId,
+                                    )));
+                      },
+                      child: SizedBox(
+                        height: 40,
+                        width: 40,
+                        child: Image.asset(
+                          "assets/images/add_rooms.png",
+                          fit: BoxFit.fill,
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+                SizedBox(height: 20),
                 SizedBox(
                   height: 300,
                   child: ListView.builder(
@@ -263,8 +277,7 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(15),
                             border: Border.all(
-                                color:
-                                Theme.of(context).colorScheme.primary),
+                                color: Theme.of(context).colorScheme.primary),
                           ),
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(15),
@@ -293,7 +306,8 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
                 GridView.count(
                   crossAxisCount: 2, // Adjust based on screen size
                   shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(), // Prevent nested scrolling issues
+                  physics:
+                      NeverScrollableScrollPhysics(), // Prevent nested scrolling issues
                   crossAxisSpacing: 5,
                   mainAxisSpacing: 10,
                   childAspectRatio: 2.8, // Adjust to prevent text wrapping
@@ -308,9 +322,6 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
                     _buildInfoCard('Validation Status', data['status']),
                   ],
                 ),
-
-
-
                 const SizedBox(height: 20),
                 const Divider(),
                 const SizedBox(height: 20),
@@ -321,7 +332,8 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
                 SizedBox(
                   height: 140, // Adjust height to fit content properly
                   child: ListView.builder(
-                    scrollDirection: Axis.horizontal, // Enable horizontal scrolling
+                    scrollDirection:
+                        Axis.horizontal, // Enable horizontal scrolling
                     itemCount: rooms.length,
                     itemBuilder: (context, index) {
                       final room = rooms[index];
@@ -329,35 +341,44 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
                         //padding: EdgeInsets.all(16.0),
                         width: 350, // Adjust width so each card is visible
                         child: GestureDetector(
-                          onTap: (){
-                          },
+                          onTap: () {},
                           child: Card(
                             margin: const EdgeInsets.all(8.0),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: Row( // Row layout for horizontal scroll
+                              child: Row(
+                                // Row layout for horizontal scroll
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   room.roomCurrentPhoto.isNotEmpty
                                       ? Image.network(
-                                    room.roomCurrentPhoto.first,
-                                    width: 80,
-                                    height: 80,
-                                    fit: BoxFit.cover,
-                                  )
-                                      : const Icon(Icons.image_not_supported, size: 80),
+                                          room.roomCurrentPhoto.first,
+                                          width: 80,
+                                          height: 80,
+                                          fit: BoxFit.cover,
+                                        )
+                                      : const Icon(Icons.image_not_supported,
+                                          size: 80),
                                   const SizedBox(width: 8),
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
-                                        Text('Room ID: ${room.roomId}', style: TextStyle(fontWeight: FontWeight.bold)),
+                                        Text('Room ID: ${room.roomId}',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold)),
                                         Text('Area: ${room.area} m²'),
                                         Text(
                                           'Status: ${room.status}',
                                           style: TextStyle(color: Colors.blue),
                                         ),
-                                        Text('Description: ${room.description}', style: TextStyle(overflow: TextOverflow.ellipsis),maxLines: 2,),
+                                        Text(
+                                          'Description: ${room.description}',
+                                          style: TextStyle(
+                                              overflow: TextOverflow.ellipsis),
+                                          maxLines: 2,
+                                        ),
                                       ],
                                     ),
                                   ),
@@ -370,63 +391,71 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
                     },
                   ),
                 ),
-
                 const SizedBox(height: 20),
                 validatorAssigned
                     ? Column(children: [
-                  DropdownButtonFormField(
-                    decoration: InputDecoration(
-                      labelText: 'Select Validator',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                        borderSide: BorderSide(color: Colors.blue, width: 1.5),
-                      ),
-                      contentPadding: EdgeInsets.symmetric(horizontal: 10.0),
-                    ),
-                    value: selectedValidator,
-                    items: validators.map((validator) {
-                      final data = validator.data() as Map<String, dynamic>;
-                      return DropdownMenuItem(
-                        value: validator.id,
-                        child: Text(data['name'] ?? 'Unknown'),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        selectedValidator = value;
-                      });
-                    },
-                  ),
-                  const SizedBox(height: 10),
-                  SizedBox(
-                    height: 40,
-                    width: double.infinity,
-                    child: ElevatedButton(onPressed: _assignValidator, child: Center(child: Text("Assign Evaluator"),)),
-                  )
-                ])
+                        DropdownButtonFormField(
+                          decoration: InputDecoration(
+                            labelText: 'Select Validator',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                              borderSide:
+                                  BorderSide(color: Colors.blue, width: 1.5),
+                            ),
+                            contentPadding:
+                                EdgeInsets.symmetric(horizontal: 10.0),
+                          ),
+                          value: selectedValidator,
+                          items: validators.map((validator) {
+                            final data =
+                                validator.data() as Map<String, dynamic>;
+                            return DropdownMenuItem(
+                              value: validator.id,
+                              child: Text(data['name'] ?? 'Unknown'),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            setState(() {
+                              selectedValidator = value;
+                            });
+                          },
+                        ),
+                        const SizedBox(height: 10),
+                        SizedBox(
+                          height: 40,
+                          width: double.infinity,
+                          child: ElevatedButton(
+                              onPressed: _assignValidator,
+                              child: Center(
+                                child: Text("Assign Evaluator"),
+                              )),
+                        )
+                      ])
                     : Center(
-                  child: SizedBox(
-                    width: double.infinity,
-                    height: 40.0,
-                    child: ElevatedButton(
-                      onPressed: () => setState(() => validatorAssigned = !validatorAssigned),
-                      child: Text(validatorAssigned ? "Cancel" : "Change Validator"),
-                    ),
-                  )
-                ),
+                        child: SizedBox(
+                        width: double.infinity,
+                        height: 40.0,
+                        child: ElevatedButton(
+                          onPressed: () => setState(
+                              () => validatorAssigned = !validatorAssigned),
+                          child: Text(validatorAssigned
+                              ? "Cancel"
+                              : "Change Validator"),
+                        ),
+                      )),
                 SizedBox(height: 10),
-                 Center(
+                Center(
                     child: SizedBox(
-                      width: double.infinity,
-                      height: 40,
-                      child: ElevatedButton.icon(
-                        icon: const Icon(Icons.delete, color: Colors.white),
-                        label: const Text('Delete Asset'),
-                        style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                        onPressed: () => _deleteAsset(context, widget.assetId),
-                      ),
-                    )
+                  width: double.infinity,
+                  height: 40,
+                  child: ElevatedButton.icon(
+                    icon: const Icon(Icons.delete, color: Colors.white),
+                    label: const Text('Delete Asset'),
+                    style:
+                        ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                    onPressed: () => _deleteAsset(context, widget.assetId),
                   ),
+                )),
               ],
             ),
           );
