@@ -1,5 +1,6 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:land_house_verify/components/my_button.dart';
 import 'package:path/path.dart' as path_lib;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:toastification/toastification.dart';
@@ -34,28 +35,29 @@ class _RegisterValidatorPageState extends State<RegisterValidatorPage> {
 
       if (result != null && result.files.single.path != null) {
         onFilePicked(result.files.single.path!);
-        
       }
     } catch (e) {
       toastification.show(
         autoCloseDuration: Duration(milliseconds: 2000),
         type: ToastificationType.error,
-        description: Text('Error picking document.'), 
+        description: Text('Error picking document.'),
       );
     }
   }
 
   /// Submit the form
   Future<void> _submitForm() async {
-    if (!_formKey.currentState!.validate() || _cvFilePath == null || _certificationFilePath == null) {
+    if (!_formKey.currentState!.validate() ||
+        _cvFilePath == null ||
+        _certificationFilePath == null) {
       toastification.show(
         autoCloseDuration: Duration(milliseconds: 2000),
         type: ToastificationType.error,
-        description: Text('Please complete all required fields.'), 
+        description: Text('Please complete all required fields.'),
       );
       return;
     }
-      
+
     _formKey.currentState!.save();
 
     setState(() => _isLoading = true);
@@ -72,7 +74,9 @@ class _RegisterValidatorPageState extends State<RegisterValidatorPage> {
     };
 
     try {
-      await FirebaseFirestore.instance.collection('pending_validators').add(validatorData);
+      await FirebaseFirestore.instance
+          .collection('pending_validators')
+          .add(validatorData);
       toastification.show(
         autoCloseDuration: Duration(milliseconds: 2000),
         type: ToastificationType.success,
@@ -89,7 +93,7 @@ class _RegisterValidatorPageState extends State<RegisterValidatorPage> {
       toastification.show(
         autoCloseDuration: Duration(milliseconds: 2000),
         type: ToastificationType.error,
-        description: Text('Error submitting registration.'), 
+        description: Text('Error submitting registration.'),
       );
       setState(() => _isLoading = false);
     }
@@ -151,26 +155,30 @@ class _RegisterValidatorPageState extends State<RegisterValidatorPage> {
                   ),
                   onChanged: (value) => setState(() => _validatorType = value!),
                   items: ['Individual', 'Organization']
-                      .map((type) => DropdownMenuItem(value: type, child: Text(type)))
+                      .map((type) =>
+                          DropdownMenuItem(value: type, child: Text(type)))
                       .toList(),
                 ),
                 const SizedBox(height: 20),
                 _buildTextField(
                   hintText: 'Name / Organization Name',
                   onSaved: (value) => _name = value!,
-                  validator: (value) => value!.isEmpty ? 'Name is required' : null,
+                  validator: (value) =>
+                      value!.isEmpty ? 'Name is required' : null,
                 ),
                 const SizedBox(height: 20),
                 _buildTextField(
                   hintText: 'Email',
                   onSaved: (value) => _email = value!,
-                  validator: (value) => value!.isEmpty ? 'Email is required' : null,
+                  validator: (value) =>
+                      value!.isEmpty ? 'Email is required' : null,
                 ),
                 const SizedBox(height: 20),
                 _buildTextField(
                   hintText: 'Phone Number',
                   onSaved: (value) => _phoneNumber = value!,
-                  validator: (value) => value!.isEmpty ? 'Phone number is required' : null,
+                  validator: (value) =>
+                      value!.isEmpty ? 'Phone number is required' : null,
                 ),
                 const SizedBox(height: 20),
                 _buildFilePickerTile(
@@ -190,13 +198,9 @@ class _RegisterValidatorPageState extends State<RegisterValidatorPage> {
                 ),
                 const SizedBox(height: 30),
                 Center(
-                  child: _isLoading
-                      ? const CircularProgressIndicator()
-                      : ElevatedButton(
-                          onPressed: _submitForm,
-                          child: const Text('Submit'),
-                        ),
-                ),
+                    child: _isLoading
+                        ? const CircularProgressIndicator()
+                        : MyButton(onTap: _submitForm, text: 'Submit')),
                 const SizedBox(height: 20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,

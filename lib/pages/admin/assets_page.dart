@@ -12,21 +12,22 @@ class AssetsPage extends StatefulWidget {
 }
 
 class _AssetsPageState extends State<AssetsPage> {
-    bool _isNotSearching = true;
-    // Variable to store the search query
+  bool _isNotSearching = true;
+  // Variable to store the search query
   String _searchQuery = "";
 
-    // Function to handle search query change
+  // Function to handle search query change
   void _onSearchQueryChanged(String query) {
     setState(() {
       _searchQuery = query;
     });
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        drawer: MyDrawer(),
-       appBar: AppBar(
+      drawer: MyDrawer(),
+      appBar: AppBar(
         title: _isNotSearching
             ? Text(
                 'Welcome',
@@ -43,7 +44,8 @@ class _AssetsPageState extends State<AssetsPage> {
                   onChanged: _onSearchQueryChanged, // Handle query change
                   decoration: InputDecoration(
                     hintText: 'Search registered assets',
-                    hintStyle: TextStyle(color: Theme.of(context).disabledColor),
+                    hintStyle:
+                        TextStyle(color: Theme.of(context).disabledColor),
                     border: InputBorder.none,
                     contentPadding: const EdgeInsets.symmetric(horizontal: 15),
                   ),
@@ -62,15 +64,12 @@ class _AssetsPageState extends State<AssetsPage> {
                   },
                   child: const Icon(Icons.search),
                 ),
-                GestureDetector(
-                  child: const Icon(Icons.more_vert),
-                )
               ],
             ),
           )
         ],
       ),
-      body:  Padding(
+      body: Padding(
         padding: const EdgeInsets.all(10.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -81,7 +80,7 @@ class _AssetsPageState extends State<AssetsPage> {
             ),
             const SizedBox(height: 10),
             // Latest Assets Page
-             SizedBox(height: 200, child: LatestAssetsPage()),
+            SizedBox(height: 200, child: LatestAssetsPage()),
             const SizedBox(height: 10),
             const Text(
               "All Registered Assets",
@@ -89,8 +88,9 @@ class _AssetsPageState extends State<AssetsPage> {
             ),
             const SizedBox(height: 10),
             // All Assets Page
-           _isNotSearching?Expanded(flex: 3, child: AllAssetsPage())
-           :SearchAsset(searchQuery: _searchQuery),
+            _isNotSearching
+                ? Expanded(flex: 3, child: AllAssetsPage())
+                : SearchAsset(searchQuery: _searchQuery),
           ],
         ),
       ),
