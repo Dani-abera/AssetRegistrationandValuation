@@ -33,6 +33,7 @@ class LatestAssetsPage extends StatelessWidget {
           itemBuilder: (context, index) {
             final data = assets[index].data() as Map<String, dynamic>;
             final assetImage = (data['assetImage'] as List?)?.first ?? '';
+            debugPrint(assetImage);
             final assetName = data['assetName'] ?? 'Unknown Asset';
 
             return GestureDetector(
@@ -53,6 +54,7 @@ class LatestAssetsPage extends StatelessWidget {
                       borderRadius: BorderRadius.circular(15),
                       child: Image.network(
                         assetImage,
+
                         height: 170,
                         width: 300,
                         fit: BoxFit.fill,
